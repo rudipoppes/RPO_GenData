@@ -20,15 +20,15 @@ export default function Samples() {
             </p>
             <div className="space-y-4">
               <div className="bg-gray-50 p-4 rounded-md">
-                <h3 className="font-medium text-gray-900 mb-2">1. Set up a Collection</h3>
+                <h3 className="font-medium text-gray-900 mb-2">1. Create an API Key</h3>
                 <p className="text-sm text-gray-600">
-                  Create a <a href="/collections" className="text-blue-600 hover:text-blue-500">Collection</a> and define fields with the data types you need.
+                  Go to the <a href="/api-keys" className="text-blue-600 hover:text-blue-500">API Keys</a> page and create a new key with the appropriate scopes.
                 </p>
               </div>
               <div className="bg-gray-50 p-4 rounded-md">
-                <h3 className="font-medium text-gray-900 mb-2">2. Create an API Key</h3>
+                <h3 className="font-medium text-gray-900 mb-2">2. Set up a Collection</h3>
                 <p className="text-sm text-gray-600">
-                  Go to the <a href="/api-keys" className="text-blue-600 hover:text-blue-500">API Keys</a> page and create a new key with the appropriate scopes.
+                  Create a <a href="/collections" className="text-blue-600 hover:text-blue-500">Collection</a> and define fields with the data types you need.
                 </p>
               </div>
               <div className="bg-gray-50 p-4 rounded-md">
