@@ -35,3 +35,19 @@ INFO:     146.75.209.12:7624 - "GET /api/admin/collections/5 HTTP/1.1" 200 OK
 INFO:     146.75.209.12:7624 - "GET /api/admin/collections HTTP/1.1" 200 OK
 INFO:     146.75.209.12:7508 - "DELETE /api/admin/collections/5 HTTP/1.1" 200 OK
 INFO:     146.75.209.12:7508 - "GET /api/admin/collections HTTP/1.1" 200 OK
+INFO:     146.75.209.13:15239 - "GET /api/admin/api-keys HTTP/1.1" 200 OK
+INFO:     205.210.31.8:60120 - "GET / HTTP/1.1" 200 OK
+INFO:     146.75.209.13:15229 - "POST /api/admin/api-keys HTTP/1.1" 401 Unauthorized
+INFO:     146.75.209.13:15229 - "GET /api-keys HTTP/1.1" 200 OK
+INFO:     146.75.209.13:15229 - "GET /index-21410e86.css HTTP/1.1" 304 Not Modified
+INFO:     146.75.209.13:15289 - "GET /index-fd6b00b6.js HTTP/1.1" 304 Not Modified
+INFO:     146.75.209.13:15229 - "GET /api/auth/me HTTP/1.1" 401 Unauthorized
+INFO:     146.75.209.13:15108 - "POST /api/auth/login HTTP/1.1" 200 OK
+INFO:     146.75.209.13:15108 - "GET /api/auth/me HTTP/1.1" 200 OK
+INFO:     146.75.209.13:15108 - "GET /api/admin/collections HTTP/1.1" 200 OK
+INFO:     146.75.209.13:15174 - "GET /api/admin/api-keys HTTP/1.1" 200 OK
+INFO:     146.75.209.13:15193 - "GET /api/admin/api-keys HTTP/1.1" 200 OK
+INFO:     146.75.209.13:15231 - "POST /api/admin/api-keys HTTP/1.1" 200 OK
+INFO:     146.75.209.13:15231 - "GET /api/admin/api-keys HTTP/1.1" 200 OK
+INFO:     146.75.209.13:15241 - "DELETE /api/admin/api-keys/1 HTTP/1.1" 200 OK
+INFO:     146.75.209.13:15241 - "GET /api/admin/api-keys HTTP/1.1" 200 OK
