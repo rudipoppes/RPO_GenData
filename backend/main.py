@@ -6,13 +6,13 @@ from contextlib import asynccontextmanager
 import os
 import uvicorn
 
-from backend.database import create_tables, SessionLocal
-from backend.models import User
-from backend.auth import hash_password
-from backend.routers.public import router as public_router
-from backend.routers.auth import router as auth_router
-from backend.routers.admin_collections import router as admin_collections_router
-from backend.routers.admin_api_keys import router as admin_api_keys_router
+from .database import create_tables, SessionLocal
+from .models import User
+from .auth import hash_password
+from .routers.public import router as public_router
+from .routers.auth import router as auth_router
+from .routers.admin_collections import router as admin_collections_router
+from .routers.admin_api_keys import router as admin_api_keys_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):

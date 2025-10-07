@@ -1,0 +1,31 @@
+INFO:     Will watch for changes in these directories: ['/home/ubuntu/RPO_GenData/backend']
+INFO:     Uvicorn running on http://0.0.0.0:8088 (Press CTRL+C to quit)
+INFO:     Started reloader process [315232] using WatchFiles
+Initializing database...
+Database already has 1 users
+Starting RPO GenData server on 0.0.0.0:8088
+INFO:     Started server process [315327]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     127.0.0.1:60730 - "POST /api/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60746 - "GET /api/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:35064 - "GET /api/admin/collections HTTP/1.1" 200 OK
+INFO:     104.28.90.36:42016 - "POST /api/auth/login HTTP/1.1" 200 OK
+INFO:     104.28.90.36:42016 - "GET /api/admin/collections HTTP/1.1" 200 OK
+INFO:     104.28.90.36:31991 - "GET /api/admin/api-keys HTTP/1.1" 200 OK
+INFO:     104.28.90.34:48855 - "GET /api/admin/collections HTTP/1.1" 200 OK
+INFO:     104.28.90.34:48855 - "GET /api/admin/collections HTTP/1.1" 200 OK
+INFO:     104.28.90.34:48855 - "GET /api/admin/collections HTTP/1.1" 200 OK
+INFO:     104.28.90.35:16934 - "GET /api/admin/api-keys HTTP/1.1" 200 OK
+INFO:     104.28.90.34:13942 - "GET /api/admin/collections HTTP/1.1" 200 OK
+INFO:     104.28.90.34:13942 - "GET /api/admin/collections HTTP/1.1" 200 OK
+INFO:     104.28.90.36:42466 - "GET /api/admin/api-keys HTTP/1.1" 200 OK
+INFO:     104.28.90.34:16443 - "GET /api/admin/collections HTTP/1.1" 200 OK
+INFO:     104.28.90.34:16754 - "GET /api/admin/api-keys HTTP/1.1" 200 OK
+INFO:     104.28.90.34:16443 - "GET /api/admin/collections HTTP/1.1" 200 OK
+INFO:     104.28.90.34:16754 - "GET /api/admin/api-keys HTTP/1.1" 200 OK
+INFO:     104.28.90.34:16443 - "GET /api/admin/collections HTTP/1.1" 200 OK
+INFO:     104.28.90.34:16754 - "GET /api/admin/api-keys HTTP/1.1" 200 OK
+INFO:     104.28.90.34:16443 - "GET /api/admin/collections HTTP/1.1" 200 OK
+INFO:     104.28.90.34:16443 - "GET /api/admin/collections HTTP/1.1" 200 OK
+INFO:     104.28.90.34:14033 - "GET /api/admin/api-keys HTTP/1.1" 200 OK

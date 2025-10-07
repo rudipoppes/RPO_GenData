@@ -1,8 +1,10 @@
 export interface User {
   id: number;
+  email: string;
   username: string;
-  role: 'admin' | 'user';
+  role: 'Admin' | 'Editor' | 'Viewer'; // Match backend enum values
   created_at: string;
+  last_login_at?: string;
 }
 
 export interface Collection {
@@ -39,14 +41,13 @@ export interface APIKey {
 }
 
 export interface LoginRequest {
-  username: string;
+  email: string;
   password: string;
 }
 
 export interface LoginResponse {
-  access_token: string;
-  token_type: string;
   user: User;
+  message: string;
 }
 
 export interface CreateCollectionRequest {

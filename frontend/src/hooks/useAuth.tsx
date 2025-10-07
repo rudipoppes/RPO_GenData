@@ -16,25 +16,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem('access_token');
-    const savedUser = localStorage.getItem('user');
-    
-    if (token && savedUser) {
+    // Check if user is authenticated by calling /auth/me
+    const checkAuth = async () => {
       try {
-        setUser(JSON.parse(savedUser));
-      } catch {
-        localStorage.removeItem('user');
-        localStorage.removeItem('access_token');
+        const currentUser = await authApi.getCurrentUser();
+        setUser(currentUser);
+      } catch (error) {
+        // User is not authenticated
+        setUser(null);
+      } finally {
+        setLoading(false);
       }
-    }
-    
-    setLoading(false);
+    };
+
+    checkAuth();
   }, []);
 
   const login = async (credentials: LoginRequest) => {
     const response = await authApi.login(credentials);
-    localStorage.setItem('access_token', response.access_token);
-    localStorage.setItem('user', JSON.stringify(response.user));
     setUser(response.user);
   };
 
@@ -42,8 +41,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       await authApi.logout();
     } finally {
-      localStorage.removeItem('access_token');
-      localStorage.removeItem('user');
       setUser(null);
     }
   };
