@@ -22,6 +22,10 @@ export default function Layout({ children }: LayoutProps) {
     { name: 'Samples', href: '/samples' },
   ];
 
+  const adminNavigation = [
+    { name: 'Users', href: '/users' },
+  ];
+
   return (
     <div className="min-h-screen bg-gray-50">
       <nav className="bg-white shadow">
@@ -48,18 +52,52 @@ export default function Layout({ children }: LayoutProps) {
                     {item.name}
                   </Link>
                 ))}
+                {/* Admin-only navigation */}
+                {user?.role === 'Admin' && adminNavigation.map((item) => (
+                  <Link
+                    key={item.name}
+                    to={item.href}
+                    className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
+                      location.pathname.startsWith(item.href)
+                        ? 'border-blue-500 text-gray-900'
+                        : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                    }`}
+                  >
+                    {item.name}
+                  </Link>
+                ))}
               </div>
             </div>
             <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-700">
-                Welcome, {user?.username}
+              {/* User role badge */}
+              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                user?.role === 'Admin' ? 'bg-red-100 text-red-800' :
+                user?.role === 'Editor' ? 'bg-blue-100 text-blue-800' :
+                'bg-gray-100 text-gray-800'
+              }`}>
+                {user?.role}
               </span>
-              <button
-                onClick={handleLogout}
-                className="text-sm text-gray-500 hover:text-gray-700"
-              >
-                Logout
-              </button>
+              
+              {/* User dropdown menu */}
+              <div className="relative">
+                <div className="flex items-center space-x-2">
+                  <span className="text-sm text-gray-700">
+                    {user?.username}
+                  </span>
+                  <Link
+                    to="/profile"
+                    className="text-sm text-gray-500 hover:text-gray-700"
+                  >
+                    Profile
+                  </Link>
+                  <button
+                    onClick={handleLogout}
+                    className="text-sm text-gray-500 hover:text-gray-700"
+                  >
+                    Logout
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>

@@ -9,7 +9,11 @@ import type {
   CreateCollectionRequest,
   CreateFieldRequest,
   CreateAPIKeyRequest,
-  CreateAPIKeyResponse
+  CreateAPIKeyResponse,
+  UserCreate,
+  UserUpdate,
+  UserProfileUpdate,
+  PasswordChangeRequest
 } from '../types/api';
 
 const api = axios.create({
@@ -91,3 +95,32 @@ export const adminApiService = {
 };
 
 export const apiService = authApi;
+
+// User Management API
+export const usersApi = {
+  // Admin-only endpoints
+  list: (): Promise<User[]> =>
+    api.get('/admin/users').then(res => res.data),
+
+  create: (userData: UserCreate): Promise<User> =>
+    api.post('/admin/users', userData).then(res => res.data),
+
+  get: (id: number): Promise<User> =>
+    api.get(`/admin/users/${id}`).then(res => res.data),
+
+  update: (id: number, userData: UserUpdate): Promise<User> =>
+    api.patch(`/admin/users/${id}`, userData).then(res => res.data),
+
+  delete: (id: number): Promise<void> =>
+    api.delete(`/admin/users/${id}`).then(res => res.data),
+
+  // Self-service endpoints
+  getProfile: (): Promise<User> =>
+    api.get('/admin/profile').then(res => res.data),
+
+  updateProfile: (profileData: UserProfileUpdate): Promise<User> =>
+    api.patch('/admin/profile', profileData).then(res => res.data),
+
+  changePassword: (passwordData: PasswordChangeRequest): Promise<void> =>
+    api.post('/admin/change-password', passwordData).then(res => res.data),
+};

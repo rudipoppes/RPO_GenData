@@ -41,7 +41,18 @@ async def create_collection(
     db.commit()
     db.refresh(db_collection)
     
-    return CollectionResponse.from_orm(db_collection)
+    # Load owner relationship and construct response manually
+    db.refresh(db_collection)
+    owner = db.query(User).filter(User.id == db_collection.owner_id).first()
+    
+    return CollectionResponse(
+        id=db_collection.id,
+        name=db_collection.name,
+        owner_id=db_collection.owner_id,
+        owner_username=owner.username,
+        created_at=db_collection.created_at,
+        updated_at=db_collection.updated_at
+    )
 
 @router.get("/collections", response_model=List[CollectionWithFields])
 async def list_collections(
@@ -53,12 +64,25 @@ async def list_collections(
     
     if current_user.role == UserRole.ADMIN:
         # Admin can see all collections
-        collections = db.query(Collection).options(joinedload(Collection.fields)).all()
+        collections = db.query(Collection).options(joinedload(Collection.fields), joinedload(Collection.owner)).all()
     else:
         # Editors and Viewers can only see their own collections
-        collections = db.query(Collection).options(joinedload(Collection.fields)).filter(Collection.owner_id == current_user.id).all()
+        collections = db.query(Collection).options(joinedload(Collection.fields), joinedload(Collection.owner)).filter(Collection.owner_id == current_user.id).all()
     
-    return [CollectionWithFields.from_orm(c) for c in collections]
+    result = []
+    for c in collections:
+        # Manually construct response with proper owner data
+        collection_data = {
+            "id": c.id,
+            "name": c.name,
+            "owner_id": c.owner_id,
+            "owner_username": c.owner.username,  # Computed from relationship
+            "created_at": c.created_at,
+            "updated_at": c.updated_at,
+            "fields": [FieldResponse.from_orm(f) for f in c.fields]
+        }
+        result.append(CollectionWithFields(**collection_data))
+    return result
 
 @router.get("/collections/{collection_id}", response_model=CollectionWithFields)
 async def get_collection(
@@ -69,7 +93,7 @@ async def get_collection(
     """Get a specific collection with its fields."""
     from app.models.user import UserRole
     
-    collection = db.query(Collection).filter(Collection.id == collection_id).first()
+    collection = db.query(Collection).options(joinedload(Collection.owner)).filter(Collection.id == collection_id).first()
     if not collection:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -86,10 +110,17 @@ async def get_collection(
     # Get fields for this collection
     fields = db.query(Field).filter(Field.collection_id == collection_id).all()
     
-    collection_dict = CollectionResponse.from_orm(collection).dict()
-    collection_dict["fields"] = [FieldResponse.from_orm(f) for f in fields]
-    
-    return CollectionWithFields(**collection_dict)
+    # Manually construct response with owner data
+    collection_data = {
+        "id": collection.id,
+        "name": collection.name,
+        "owner_id": collection.owner_id,
+        "owner_username": collection.owner.username,
+        "created_at": collection.created_at,
+        "updated_at": collection.updated_at,
+        "fields": [FieldResponse.from_orm(f) for f in fields]
+    }
+    return CollectionWithFields(**collection_data)
 
 @router.patch("/collections/{collection_id}", response_model=CollectionResponse)
 async def update_collection(
@@ -101,7 +132,7 @@ async def update_collection(
     """Update a collection."""
     from app.models.user import UserRole
     
-    collection = db.query(Collection).filter(Collection.id == collection_id).first()
+    collection = db.query(Collection).options(joinedload(Collection.owner)).filter(Collection.id == collection_id).first()
     if not collection:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -132,7 +163,17 @@ async def update_collection(
     db.commit()
     db.refresh(collection)
     
-    return CollectionResponse.from_orm(collection)
+    # Load owner relationship and construct response manually
+    owner = db.query(User).filter(User.id == collection.owner_id).first()
+    
+    return CollectionResponse(
+        id=collection.id,
+        name=collection.name,
+        owner_id=collection.owner_id,
+        owner_username=owner.username,
+        created_at=collection.created_at,
+        updated_at=collection.updated_at
+    )
 
 @router.delete("/collections/{collection_id}")
 async def delete_collection(
@@ -143,7 +184,7 @@ async def delete_collection(
     """Delete a collection."""
     from app.models.user import UserRole
     
-    collection = db.query(Collection).filter(Collection.id == collection_id).first()
+    collection = db.query(Collection).options(joinedload(Collection.owner)).filter(Collection.id == collection_id).first()
     if not collection:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -173,7 +214,7 @@ async def create_field(
     """Create a new field for a collection."""
     from app.models.user import UserRole
     
-    collection = db.query(Collection).filter(Collection.id == collection_id).first()
+    collection = db.query(Collection).options(joinedload(Collection.owner)).filter(Collection.id == collection_id).first()
     if not collection:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

@@ -179,6 +179,11 @@ export default function Collections() {
                         <p className="text-lg font-medium text-gray-900 truncate">{collection.name}</p>
                         <p className="text-sm text-gray-500">
                           {collection.fields?.length || 0} field{(collection.fields?.length || 0) !== 1 ? 's' : ''}
+                        {collection.owner_username && (
+                          <p className="text-xs text-gray-400">
+                            Owner: {collection.owner_username}
+                          </p>
+                        )}
                         </p>
                       </Link>
                     </div>

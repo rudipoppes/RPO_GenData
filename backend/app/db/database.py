@@ -22,3 +22,11 @@ def get_db():
         yield db
     finally:
         db.close()
+
+def create_tables():
+    """Create all tables in the database"""
+    from app.models.user import User
+    from app.models.collection import Collection  
+    from app.models.field import Field
+    from app.models.api_key import ApiKey
+    Base.metadata.create_all(bind=engine)

@@ -13,6 +13,7 @@ class CollectionResponse(BaseModel):
     id: int
     name: str
     owner_id: int
+    owner_username: str
     created_at: datetime
     updated_at: datetime
     

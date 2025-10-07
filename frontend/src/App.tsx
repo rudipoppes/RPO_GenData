@@ -9,6 +9,8 @@ import CreateCollection from './pages/CreateCollection';
 import EditCollection from './pages/EditCollection';
 import ApiKeys from './pages/ApiKeys';
 import Samples from './pages/Samples';
+import Users from './pages/Users';
+import Profile from './pages/Profile';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
@@ -58,6 +60,8 @@ function AuthenticatedApp() {
                 <Route path="/collections/:id/edit" element={<EditCollection />} />
                 <Route path="/api-keys" element={<ApiKeys />} />
                 <Route path="/samples" element={<Samples />} />
+                <Route path="/users" element={<Users />} />
+                <Route path="/profile" element={<Profile />} />
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
             </Layout>

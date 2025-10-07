@@ -12,6 +12,7 @@ export interface Collection {
   name: string;
   description?: string;
   owner_id: number;
+  owner_username?: string;
   created_at: string;
   updated_at: string;
   fields?: Field[];
@@ -117,4 +118,29 @@ export interface CreateAPIKeyResponse {
   last_used_at?: string;
   created_at: string;
   key: string;
+}
+
+// User Management Types
+export interface UserCreate {
+  email: string;
+  username: string;
+  password: string;
+  role: 'Admin' | 'Editor' | 'Viewer';
+}
+
+export interface UserUpdate {
+  email?: string;
+  username?: string;
+  role?: 'Admin' | 'Editor' | 'Viewer';
+  password?: string;
+}
+
+export interface UserProfileUpdate {
+  email?: string;
+  username?: string;
+}
+
+export interface PasswordChangeRequest {
+  current_password: string;
+  new_password: string;
 }

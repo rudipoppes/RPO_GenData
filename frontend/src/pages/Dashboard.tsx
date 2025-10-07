@@ -252,6 +252,11 @@ export default function Dashboard() {
                           <p className="text-sm font-medium text-gray-900 truncate">{collection.name}</p>
                           <p className="text-sm text-gray-500">
                             {collection.fields?.length || 0} field{(collection.fields?.length || 0) !== 1 ? 's' : ''}
+                          {collection.owner_username && (
+                            <p className="text-xs text-gray-400">
+                              Owner: {collection.owner_username}
+                            </p>
+                          )}
                           </p>
                           {matchType === 'field' && searchTerm && (
                             <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 mt-1">

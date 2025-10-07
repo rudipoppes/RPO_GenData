@@ -119,18 +119,18 @@ export default function ApiKeys() {
                     <div className="flex-1">
                       <div className="flex items-center">
                         <div className="font-medium text-gray-900">
-                          {apiKey.key_name}
+                          {apiKey.label}
                         </div>
                         <span className={`ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                          apiKey.is_active 
+                          apiKey.status === "active" 
                             ? 'bg-green-100 text-green-800' 
                             : 'bg-red-100 text-red-800'
                         }`}>
-                          {apiKey.is_active ? 'Active' : 'Revoked'}
+                          {apiKey.status === 'active' ? 'Active' : 'Revoked'}
                         </span>
                       </div>
                       <div className="mt-1 text-sm text-gray-500">
-                        <div>Key: {apiKey.key_hash.substring(0, 8)}••••</div>
+                        <div>Key: {apiKey.key_prefix}••••</div>
                         <div>Scopes: {'API Access'}</div>
                         <div>Created: {new Date(apiKey.created_at).toLocaleDateString()}</div>
                         {apiKey.expires_at && (
@@ -139,7 +139,7 @@ export default function ApiKeys() {
                       </div>
                     </div>
                     <div className="flex space-x-2">
-                      {apiKey.is_active && (
+                      {apiKey.status === "active" && (
                         <button
                           onClick={() => handleRevoke(apiKey.id)}
                           className="text-yellow-600 hover:text-yellow-500 text-sm"
@@ -173,7 +173,7 @@ function CreateApiKeyForm({
   onCancel: () => void;
 }) {
   const [name, setName] = useState('');
-  const [scopes, setScopes] = useState<string[]>(['read']);
+  const [scopes, setScopes] = useState<string[]>([]);
   const [expiresAt, setExpiresAt] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [createdKey, setCreatedKey] = useState<CreateAPIKeyResponse | null>(null);
@@ -185,8 +185,7 @@ function CreateApiKeyForm({
     setSubmitting(true);
 
     const keyData: CreateAPIKeyRequest = {
-      name,
-      scopes,
+      label: name,
       
       expires_at: expiresAt || undefined
     };
@@ -218,7 +217,7 @@ function CreateApiKeyForm({
               Your API key has been created. Make sure to copy it now - you won't be able to see it again.
             </p>
             <div className="bg-gray-50 p-3 rounded-md border">
-              <code className="text-sm font-mono">{createdKey.api_key}</code>
+              <code className="text-sm font-mono">{createdKey.key}</code>
             </div>
           </div>
           <div className="flex justify-end">
