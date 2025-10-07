@@ -6,6 +6,9 @@ import os
 
 from app.core.config import settings
 from app.api.public import router as public_router
+from app.api.auth import router as auth_router
+from app.api.admin_collections import router as admin_collections_router
+from app.api.admin_api_keys import router as admin_api_keys_router
 
 # Create FastAPI app
 app = FastAPI(
@@ -28,6 +31,9 @@ app.add_middleware(
 
 # Include routers
 app.include_router(public_router, prefix=settings.api_prefix, tags=["public"])
+app.include_router(auth_router, prefix="/auth", tags=["authentication"])
+app.include_router(admin_collections_router, prefix=settings.admin_prefix, tags=["admin-collections"])
+app.include_router(admin_api_keys_router, prefix=settings.admin_prefix, tags=["admin-api-keys"])
 
 # Serve static files for the admin UI (to be added later)
 static_dir = os.path.join(os.path.dirname(__file__), "..", "..", "frontend", "dist")
