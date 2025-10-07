@@ -14,32 +14,45 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [initialized, setInitialized] = useState(false);
 
   useEffect(() => {
-    // Check if user is authenticated by calling /auth/me
-    const checkAuth = async () => {
-      try {
-        const currentUser = await authApi.getCurrentUser();
-        setUser(currentUser);
-      } catch (error) {
-        // User is not authenticated
-        setUser(null);
-      } finally {
-        setLoading(false);
-      }
-    };
+    // Only run auth check once on mount
+    if (!initialized) {
+      checkAuth();
+    }
+  }, [initialized]);
 
-    checkAuth();
-  }, []);
+  const checkAuth = async () => {
+    try {
+      setLoading(true);
+      const currentUser = await authApi.getCurrentUser();
+      setUser(currentUser);
+    } catch (error) {
+      // User is not authenticated - this is fine
+      setUser(null);
+    } finally {
+      setLoading(false);
+      setInitialized(true);
+    }
+  };
 
   const login = async (credentials: LoginRequest) => {
-    const response = await authApi.login(credentials);
-    setUser(response.user);
+    try {
+      const response = await authApi.login(credentials);
+      setUser(response.user);
+    } catch (error) {
+      // Re-throw to let the login component handle the error
+      throw error;
+    }
   };
 
   const logout = async () => {
     try {
       await authApi.logout();
+    } catch (error) {
+      // Even if logout fails on server, clear local state
+      console.error('Logout error:', error);
     } finally {
       setUser(null);
     }

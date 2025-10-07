@@ -21,16 +21,6 @@ const api = axios.create({
 });
 
 // Handle auth errors
-api.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      localStorage.removeItem('user');
-      window.location.href = '/login';
-    }
-    return Promise.reject(error);
-  }
-);
 
 export const authApi = {
   login: (credentials: LoginRequest): Promise<LoginResponse> =>
@@ -54,7 +44,7 @@ export const collectionsApi = {
     api.post('/admin/collections', collection).then(res => res.data),
 
   update: (id: number, collection: Partial<CreateCollectionRequest>): Promise<Collection> =>
-    api.put(`/admin/collections/${id}`, collection).then(res => res.data),
+    api.patch(`/admin/collections/${id}`, collection).then(res => res.data),
 
   delete: (id: number): Promise<void> =>
     api.delete(`/admin/collections/${id}`).then(res => res.data),
@@ -67,11 +57,11 @@ export const fieldsApi = {
   create: (collectionId: number, field: CreateFieldRequest): Promise<Field> =>
     api.post(`/admin/collections/${collectionId}/fields`, field).then(res => res.data),
 
-  update: (collectionId: number, fieldId: number, field: Partial<CreateFieldRequest>): Promise<Field> =>
-    api.put(`/admin/collections/${collectionId}/fields/${fieldId}`, field).then(res => res.data),
+  update: (_collectionId: number, fieldId: number, field: Partial<CreateFieldRequest>): Promise<Field> =>
+    api.patch(`/admin/fields/${fieldId}`, field).then(res => res.data),
 
-  delete: (collectionId: number, fieldId: number): Promise<void> =>
-    api.delete(`/admin/collections/${collectionId}/fields/${fieldId}`).then(res => res.data),
+  delete: (_collectionId: number, fieldId: number): Promise<void> =>
+    api.delete(`/admin/fields/${fieldId}`).then(res => res.data),
 };
 
 export const apiKeysApi = {
@@ -92,3 +82,12 @@ export const apiKeysApi = {
 };
 
 export default api;
+
+export const adminApiService = {
+  getDashboardStats: async () => {
+    const response = await api.get('/admin/stats');
+    return response.data;
+  },
+};
+
+export const apiService = authApi;

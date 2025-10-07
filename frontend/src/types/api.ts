@@ -2,7 +2,7 @@ export interface User {
   id: number;
   email: string;
   username: string;
-  role: 'Admin' | 'Editor' | 'Viewer'; // Match backend enum values
+  role: 'Admin' | 'Editor' | 'Viewer';
   created_at: string;
   last_login_at?: string;
 }
@@ -11,16 +11,17 @@ export interface Collection {
   id: number;
   name: string;
   description?: string;
-  user_id: number;
+  owner_id: number;
   created_at: string;
   updated_at: string;
+  fields?: Field[];
 }
 
 export interface Field {
   id: number;
   name: string;
-  field_type: 'string' | 'number' | 'boolean' | 'date' | 'email' | 'uuid';
-  value_type: 'fixed' | 'range' | 'list' | 'pattern' | 'epoch' | 'increment' | 'decrement';
+  field_type: string;
+  value_type: 'TEXT_FIXED' | 'NUMBER_FIXED' | 'FLOAT_FIXED' | 'EPOCH_NOW' | 'NUMBER_RANGE' | 'FLOAT_RANGE' | 'INCREMENT' | 'DECREMENT';
   value_config: Record<string, any>;
   collection_id: number;
   created_at: string;
@@ -56,10 +57,9 @@ export interface CreateCollectionRequest {
 }
 
 export interface CreateFieldRequest {
-  name: string;
-  field_type: 'string' | 'number' | 'boolean' | 'date' | 'email' | 'uuid';
-  value_type: 'fixed' | 'range' | 'list' | 'pattern' | 'epoch' | 'increment' | 'decrement';
-  value_config: Record<string, any>;
+  collection_type: "Performance" | "Configuration";
+  field_name: string;
+  value_type: 'TEXT_FIXED' | 'NUMBER_FIXED' | 'FLOAT_FIXED' | 'EPOCH_NOW' | 'NUMBER_RANGE' | 'FLOAT_RANGE' | 'INCREMENT' | 'DECREMENT';
 }
 
 export interface CreateAPIKeyRequest {
