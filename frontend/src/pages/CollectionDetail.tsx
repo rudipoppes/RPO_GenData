@@ -12,6 +12,7 @@ export default function CollectionDetail() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [showAddField, setShowAddField] = useState(false);
+  const [editingField, setEditingField] = useState<Field | null>(null);
   
   // New field form state
   const [newField, setNewField] = useState<CreateFieldRequest>({
@@ -60,89 +61,42 @@ export default function CollectionDetail() {
 
   const handleAddField = async () => {
     try {
-      // Validate required fields based on value_type
-      const fieldData: CreateFieldRequest = {
-        collection_type: activeTab,
-        field_name: newField.field_name,
-        value_type: newField.value_type
-      };
-
-      // Add required configuration based on field type
-      switch (newField.value_type) {
-        case 'TEXT_FIXED':
-          if (!newField.fixed_value_text?.trim()) {
-            setError('Fixed text value is required for TEXT_FIXED fields');
-            return;
-          }
-          fieldData.fixed_value_text = newField.fixed_value_text;
-          break;
-          
-        case 'NUMBER_FIXED':
-          if (newField.fixed_value_number === undefined || newField.fixed_value_number === null) {
-            setError('Fixed number value is required for NUMBER_FIXED fields');
-            return;
-          }
-          fieldData.fixed_value_number = newField.fixed_value_number;
-          break;
-          
-        case 'FLOAT_FIXED':
-          if (newField.fixed_value_float === undefined || newField.fixed_value_float === null) {
-            setError('Fixed float value is required for FLOAT_FIXED fields');
-            return;
-          }
-          fieldData.fixed_value_float = newField.fixed_value_float;
-          break;
-          
-        case 'NUMBER_RANGE':
-          if (newField.range_start_number === undefined || newField.range_end_number === undefined) {
-            setError('Start and end values are required for NUMBER_RANGE fields');
-            return;
-          }
-          fieldData.range_start_number = newField.range_start_number;
-          fieldData.range_end_number = newField.range_end_number;
-          break;
-          
-        case 'FLOAT_RANGE':
-          if (newField.range_start_float === undefined || newField.range_end_float === undefined) {
-            setError('Start and end values are required for FLOAT_RANGE fields');
-            return;
-          }
-          fieldData.range_start_float = newField.range_start_float;
-          fieldData.range_end_float = newField.range_end_float;
-          fieldData.float_precision = newField.float_precision || 2;
-          break;
-          
-        case 'INCREMENT':
-        case 'DECREMENT':
-          if (newField.start_number === undefined || newField.step_number === undefined) {
-            setError('Start and step values are required for INCREMENT/DECREMENT fields');
-            return;
-          }
-          fieldData.start_number = newField.start_number;
-          fieldData.step_number = newField.step_number;
-          if (newField.reset_number !== undefined) {
-            fieldData.reset_number = newField.reset_number;
-          }
-          break;
-          
-        case 'EPOCH_NOW':
-          // No additional configuration needed
-          break;
+      if (editingField) {
+        // Update existing field
+        await fieldsApi.update(collectionId, editingField.id, newField);
+      } else {
+        // Create new field
+        const fieldData: CreateFieldRequest = {
+          collection_type: activeTab,
+          field_name: newField.field_name,
+          value_type: newField.value_type,
+          ...(newField.fixed_value_text && { fixed_value_text: newField.fixed_value_text }),
+          ...(newField.fixed_value_number !== undefined && { fixed_value_number: newField.fixed_value_number }),
+          ...(newField.fixed_value_float !== undefined && { fixed_value_float: newField.fixed_value_float }),
+          ...(newField.range_start_number !== undefined && { range_start_number: newField.range_start_number }),
+          ...(newField.range_end_number !== undefined && { range_end_number: newField.range_end_number }),
+          ...(newField.range_start_float !== undefined && { range_start_float: newField.range_start_float }),
+          ...(newField.range_end_float !== undefined && { range_end_float: newField.range_end_float }),
+          ...(newField.float_precision !== undefined && { float_precision: newField.float_precision }),
+          ...(newField.start_number !== undefined && { start_number: newField.start_number }),
+          ...(newField.step_number !== undefined && { step_number: newField.step_number }),
+          ...(newField.reset_number !== undefined && { reset_number: newField.reset_number }),
+          ...(newField.current_number !== undefined && { current_number: newField.current_number })
+        };
+        await fieldsApi.create(collectionId, fieldData);
       }
-
-      await fieldsApi.create(collectionId, fieldData);
-      
-      // Reset form
+      await loadCollection();
+      setShowAddField(false);
+                    setEditingField(null);
+      setEditingField(null);
       setNewField({
         collection_type: activeTab,
-        field_name: '',
-        value_type: 'TEXT_FIXED'
+        field_name: "",
+        value_type: "TEXT_FIXED"
       });
-      setShowAddField(false);
-      setError('');
-      await loadCollection();
+      setError("");
     } catch (err: any) {
-      setError(err.response?.data?.detail || 'Failed to create field');
+      setError(err.response?.data?.detail || `Failed to ${editingField ? "update" : "create"} field`);
     }
   };
 
@@ -483,6 +437,16 @@ export default function CollectionDetail() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <button
+                          onClick={() => {
+                            setEditingField(field);
+                            setNewField(field as any);
+                            setShowAddField(true);
+                          }}
+                          className="text-blue-600 hover:text-blue-900 mr-4"
+                        >
+                          Edit
+                        </button>
+                        <button
                           onClick={() => handleDeleteField(field.id)}
                           className="text-red-600 hover:text-red-900"
                         >
@@ -504,10 +468,11 @@ export default function CollectionDetail() {
           <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white max-h-[80vh] overflow-y-auto">
             <div className="mt-3">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-medium text-gray-900">Add New Field</h3>
+                <h3 className="text-lg font-medium text-gray-900">{editingField ? "Edit Field" : "Add New Field"}</h3>
                 <button
                   onClick={() => {
                     setShowAddField(false);
+                    setEditingField(null);
                     setError('');
                     setNewField({
                       collection_type: activeTab,
@@ -561,6 +526,7 @@ export default function CollectionDetail() {
                 <button
                   onClick={() => {
                     setShowAddField(false);
+                    setEditingField(null);
                     setError('');
                     setNewField({
                       collection_type: activeTab,
@@ -577,7 +543,7 @@ export default function CollectionDetail() {
                   disabled={!newField.field_name}
                   className="bg-blue-600 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
                 >
-                  Add Field
+                  {editingField ? "Update Field" : "Add Field"}
                 </button>
               </div>
             </div>

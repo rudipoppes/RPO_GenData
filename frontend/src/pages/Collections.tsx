@@ -7,6 +7,7 @@ export default function Collections() {
   const [collections, setCollections] = useState<Collection[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
     loadCollections();
@@ -22,6 +23,50 @@ export default function Collections() {
     } finally {
       setLoading(false);
     }
+  };
+  // Search function across collections and fields
+  const filteredCollections = collections.filter(collection => {
+    if (!searchTerm) return true;
+    
+    const term = searchTerm.toLowerCase();
+    
+    // Search collection name and description
+    if (collection.name.toLowerCase().includes(term) || 
+        collection.description?.toLowerCase().includes(term)) {
+      return true;
+    }
+    
+    // Search in field names, types, and field values (if fields exist)
+    if (collection.fields && collection.fields.length > 0) {
+      return collection.fields.some(field => 
+        field.field_name.toLowerCase().includes(term) ||
+        field.value_type.toLowerCase().includes(term) ||
+        (field.fixed_value_text && field.fixed_value_text.toLowerCase().includes(term)) ||
+        (field.fixed_value_number && field.fixed_value_number.toString().includes(term)) ||
+        (field.fixed_value_float && field.fixed_value_float.toString().includes(term)) ||
+        (field.range_start_number && field.range_start_number.toString().includes(term)) ||
+        (field.range_end_number && field.range_end_number.toString().includes(term)) ||
+        (field.range_start_float && field.range_start_float.toString().includes(term)) ||
+        (field.range_end_float && field.range_end_float.toString().includes(term)) ||
+        (field.start_number && field.start_number.toString().includes(term)) ||
+        (field.step_number && field.step_number.toString().includes(term)) ||
+        (field.reset_number && field.reset_number.toString().includes(term))
+      );
+    }
+    
+    return false;
+  });
+
+  const getSearchMatchType = (collection: Collection) => {
+    if (!searchTerm) return null;
+    const term = searchTerm.toLowerCase();
+    
+    if (collection.name.toLowerCase().includes(term) || 
+        collection.description?.toLowerCase().includes(term)) {
+      return 'collection';
+    }
+    
+    return 'field';
   };
 
   if (loading) {
@@ -50,6 +95,30 @@ export default function Collections() {
           </Link>
         </div>
       </div>
+      {/* Search Bar */}
+      <div className="mb-6">
+        <div className="relative">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </div>
+          <input
+            id="search"
+            name="search"
+            className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+            placeholder="Search collections and fields..."
+            type="search"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+        {searchTerm && (
+          <p className="mt-2 text-sm text-gray-600">
+            Found {filteredCollections.length} collection{filteredCollections.length !== 1 ? 's' : ''}
+          </p>
+        )}
+      </div>
 
       {error && (
         <div className="rounded-md bg-red-50 p-4 mb-6">
@@ -59,7 +128,7 @@ export default function Collections() {
 
       <div className="bg-white shadow rounded-lg">
         <div className="p-6">
-          {collections.length === 0 ? (
+          {filteredCollections.length === 0 ? (
             <div className="text-center py-12">
               <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14-7l-14 14" />
@@ -80,11 +149,22 @@ export default function Collections() {
             </div>
           ) : (
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {collections.map((collection) => (
+              {filteredCollections.map((collection) => {
+                const matchType = getSearchMatchType(collection);
+                return (
                 <div
                   key={collection.id}
-                  className="relative rounded-lg border border-gray-300 bg-white p-6 shadow-sm hover:shadow-md transition-shadow"
+                  className={`relative rounded-lg border p-6 shadow-sm hover:shadow-md transition-shadow ${
+                    matchType ? "border-blue-300 bg-blue-50" : "border-gray-300 bg-white"
+                  }`}
                 >
+                  {matchType === "field" && searchTerm && (
+                    <div className="absolute top-2 right-2">
+                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                        Match in fields
+                      </span>
+                    </div>
+                  )}
                   <div className="flex items-center space-x-3">
                     <div className="flex-shrink-0">
                       <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
@@ -132,7 +212,8 @@ export default function Collections() {
                     </Link>
                   </div>
                 </div>
-              ))}
+);
+              })}
             </div>
           )}
         </div>

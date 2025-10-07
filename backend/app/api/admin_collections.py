@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from sqlalchemy.exc import IntegrityError
 from typing import List
 
@@ -43,7 +43,7 @@ async def create_collection(
     
     return CollectionResponse.from_orm(db_collection)
 
-@router.get("/collections", response_model=List[CollectionResponse])
+@router.get("/collections", response_model=List[CollectionWithFields])
 async def list_collections(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
@@ -53,12 +53,12 @@ async def list_collections(
     
     if current_user.role == UserRole.ADMIN:
         # Admin can see all collections
-        collections = db.query(Collection).all()
+        collections = db.query(Collection).options(joinedload(Collection.fields)).all()
     else:
         # Editors and Viewers can only see their own collections
-        collections = db.query(Collection).filter(Collection.owner_id == current_user.id).all()
+        collections = db.query(Collection).options(joinedload(Collection.fields)).filter(Collection.owner_id == current_user.id).all()
     
-    return [CollectionResponse.from_orm(c) for c in collections]
+    return [CollectionWithFields.from_orm(c) for c in collections]
 
 @router.get("/collections/{collection_id}", response_model=CollectionWithFields)
 async def get_collection(

@@ -19,26 +19,42 @@ export interface Collection {
 
 export interface Field {
   id: number;
-  name: string;
-  field_type: string;
-  value_type: 'TEXT_FIXED' | 'NUMBER_FIXED' | 'FLOAT_FIXED' | 'EPOCH_NOW' | 'NUMBER_RANGE' | 'FLOAT_RANGE' | 'INCREMENT' | 'DECREMENT';
-  value_config: Record<string, any>;
   collection_id: number;
+  collection_type: "Performance" | "Configuration";
+  field_name: string;
+  value_type: 'TEXT_FIXED' | 'NUMBER_FIXED' | 'FLOAT_FIXED' | 'EPOCH_NOW' | 'NUMBER_RANGE' | 'FLOAT_RANGE' | 'INCREMENT' | 'DECREMENT';
+  
+  // Fixed value fields
+  fixed_value_text?: string;
+  fixed_value_number?: number;
+  fixed_value_float?: number;
+  
+  // Range fields
+  range_start_number?: number;
+  range_end_number?: number;
+  range_start_float?: number;
+  range_end_float?: number;
+  float_precision?: number;
+  
+  // Increment/Decrement fields
+  start_number?: number;
+  step_number?: number;
+  reset_number?: number;
+  current_number?: number;
+  
   created_at: string;
   updated_at: string;
 }
 
 export interface APIKey {
   id: number;
-  name: string;
-  key_prefix: string;
-  scopes: string[];
-  allowed_collections: number[];
-  is_active: boolean;
   user_id: number;
-  created_at: string;
-  updated_at: string;
+  key_prefix: string;
+  label: string;
+  status: 'active' | 'revoked';
   expires_at?: string;
+  last_used_at?: string;
+  created_at: string;
 }
 
 export interface LoginRequest {
@@ -56,24 +72,49 @@ export interface CreateCollectionRequest {
   description?: string;
 }
 
+export interface UpdateCollectionRequest {
+  name: string;
+  description?: string;
+}
+
 export interface CreateFieldRequest {
   collection_type: "Performance" | "Configuration";
   field_name: string;
   value_type: 'TEXT_FIXED' | 'NUMBER_FIXED' | 'FLOAT_FIXED' | 'EPOCH_NOW' | 'NUMBER_RANGE' | 'FLOAT_RANGE' | 'INCREMENT' | 'DECREMENT';
+  
+  // Fixed value fields (optional)
+  fixed_value_text?: string;
+  fixed_value_number?: number;
+  fixed_value_float?: number;
+  
+  // Range fields (optional)
+  range_start_number?: number;
+  range_end_number?: number;
+  range_start_float?: number;
+  range_end_float?: number;
+  float_precision?: number;
+  
+  // Increment/Decrement fields (optional)
+  start_number?: number;
+  step_number?: number;
+  reset_number?: number;
+  current_number?: number;
 }
 
 export interface CreateAPIKeyRequest {
-  name: string;
-  scopes: string[];
-  allowed_collections: number[];
+  label: string;
   expires_at?: string;
+  collection_ids?: number[];
 }
 
 export interface CreateAPIKeyResponse {
   id: number;
-  name: string;
-  key: string;
-  scopes: string[];
-  allowed_collections: number[];
+  user_id: number;
+  key_prefix: string;
+  label: string;
+  status: 'active' | 'revoked';
   expires_at?: string;
+  last_used_at?: string;
+  created_at: string;
+  key: string;
 }
