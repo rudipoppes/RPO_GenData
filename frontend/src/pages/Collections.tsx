@@ -10,7 +10,7 @@ interface DeleteConfirmationDialogProps {
   onCancel: () => void;
   cascadeInfo: {
     fields: number;
-    api_key_permissions: number;
+
   };
 }
 
@@ -41,7 +41,7 @@ function DeleteConfirmationDialog({
               <h4 className="text-sm font-medium text-yellow-800">This will also delete:</h4>
               <ul className="mt-2 text-sm text-yellow-700">
                 <li>• {cascadeInfo.fields} field{cascadeInfo.fields !== 1 ? 's' : ''}</li>
-                <li>• {cascadeInfo.api_key_permissions} API key permission{cascadeInfo.api_key_permissions !== 1 ? 's' : ''}</li>
+
               </ul>
             </div>
             <div className="mt-4 max-h-32 overflow-y-auto">
@@ -81,7 +81,7 @@ export default function Collections() {
   const [selectedCollections, setSelectedCollections] = useState<Set<number>>(new Set());
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [deleting, setDeleting] = useState(false);
-  const [cascadeInfo, setCascadeInfo] = useState({ fields: 0, api_key_permissions: 0 });
+  const [cascadeInfo, setCascadeInfo] = useState({ fields: 0});
 
   useEffect(() => {
     loadCollections();
@@ -167,7 +167,6 @@ export default function Collections() {
     const selectedCollectionObjects = collections.filter(c => selectedCollectionIds.includes(c.id));
     
     let totalFields = 0;
-    let totalApiKeyPermissions = 0;
     
     selectedCollectionObjects.forEach(collection => {
       totalFields += collection.fields?.length || 0;
@@ -176,9 +175,7 @@ export default function Collections() {
     });
     
     return {
-      fields: totalFields,
-      api_key_permissions: totalApiKeyPermissions // Will be updated by backend response
-    };
+      fields: totalFields};
   };
 
   const handleDeleteClick = () => {

@@ -18,3 +18,26 @@ Starting RPO GenData server on 0.0.0.0:8088
 INFO:     Started server process [570086]
 INFO:     Waiting for application startup.
 INFO:     Application startup complete.
+INFO:     104.28.90.34:56496 - "GET /api/admin/collections HTTP/1.1" 200 OK
+INFO:     104.28.90.34:56496 - "GET /collections HTTP/1.1" 200 OK
+INFO:     104.28.90.34:56496 - "GET /api/auth/me HTTP/1.1" 200 OK
+INFO:     104.28.90.34:56496 - "GET /api/admin/collections HTTP/1.1" 200 OK
+INFO:     104.28.90.34:56447 - "POST /api/admin/collections HTTP/1.1" 200 OK
+INFO:     104.28.90.34:56447 - "GET /api/admin/collections/5 HTTP/1.1" 200 OK
+INFO:     104.28.90.34:56447 - "GET /api/admin/collections HTTP/1.1" 200 OK
+INFO:     104.28.90.34:56514 - "GET /collections HTTP/1.1" 200 OK
+INFO:     104.28.90.34:56514 - "GET /api/auth/me HTTP/1.1" 200 OK
+INFO:     104.28.90.34:56514 - "GET /api/admin/collections HTTP/1.1" 200 OK
+INFO:     104.28.90.34:56514 - "GET /api/admin/api-keys HTTP/1.1" 200 OK
+INFO:     104.28.90.34:56514 - "GET /api/admin/collections HTTP/1.1" 200 OK
+INFO:     104.28.90.34:56771 - "GET /collections HTTP/1.1" 200 OK
+INFO:     104.28.90.34:56771 - "GET /index-57a8a4d2.css HTTP/1.1" 200 OK
+INFO:     104.28.90.34:56739 - "GET /index-c775d08a.js HTTP/1.1" 200 OK
+INFO:     104.28.90.34:56771 - "GET /api/auth/me HTTP/1.1" 200 OK
+INFO:     104.28.90.34:56739 - "GET /api/admin/collections HTTP/1.1" 200 OK
+INFO:     104.28.90.34:56771 - "GET /collections HTTP/1.1" 200 OK
+INFO:     104.28.90.34:56739 - "GET /api/auth/me HTTP/1.1" 200 OK
+INFO:     104.28.90.34:56771 - "GET /api/admin/collections HTTP/1.1" 200 OK
+INFO:     104.28.90.34:56739 - "GET /api/admin/collections HTTP/1.1" 200 OK
+INFO:     104.28.90.34:56771 - "GET /api/admin/api-keys HTTP/1.1" 200 OK
+INFO:     104.28.90.34:56771 - "GET /api/admin/collections HTTP/1.1" 200 OK
