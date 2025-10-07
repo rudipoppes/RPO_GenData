@@ -1,0 +1,37 @@
+nohup: ignoring input
+Starting Data Generator Service on port 8088...
+Service will be accessible at:
+  - External: http://3.26.11.198:8088/
+  - Internal: http://localhost:8088/
+  - API Docs: http://3.26.11.198:8088/api/docs
+
+Default admin credentials:
+  Email: admin@example.com
+  Password: admin123
+
+INFO:     Will watch for changes in these directories: ['/home/ubuntu/RPO_GenData/backend']
+INFO:     Uvicorn running on http://0.0.0.0:8088 (Press CTRL+C to quit)
+INFO:     Started reloader process [543896] using WatchFiles
+Initializing database...
+Database already has 2 users
+Starting RPO GenData server on 0.0.0.0:8088
+INFO:     Started server process [543987]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     146.75.209.12:7620 - "GET /collections HTTP/1.1" 200 OK
+INFO:     146.75.209.12:7540 - "GET /index-21410e86.css HTTP/1.1" 304 Not Modified
+INFO:     146.75.209.12:7620 - "GET /index-fd6b00b6.js HTTP/1.1" 304 Not Modified
+INFO:     146.75.209.12:7540 - "GET /api/auth/me HTTP/1.1" 200 OK
+INFO:     146.75.209.12:7620 - "GET /api/admin/collections HTTP/1.1" 200 OK
+INFO:     146.75.209.12:7648 - "GET /collections HTTP/1.1" 200 OK
+INFO:     146.75.209.12:7648 - "GET /api/auth/me HTTP/1.1" 200 OK
+INFO:     146.75.209.12:7648 - "GET /api/admin/collections HTTP/1.1" 200 OK
+INFO:     146.75.209.12:7654 - "DELETE /api/admin/collections/bulk HTTP/1.1" 200 OK
+INFO:     146.75.209.12:7654 - "GET /api/admin/collections HTTP/1.1" 200 OK
+INFO:     146.75.209.12:7624 - "POST /api/admin/collections HTTP/1.1" 200 OK
+INFO:     146.75.209.12:7624 - "GET /api/admin/collections/5 HTTP/1.1" 200 OK
+INFO:     146.75.209.12:7624 - "POST /api/admin/collections/5/fields HTTP/1.1" 200 OK
+INFO:     146.75.209.12:7624 - "GET /api/admin/collections/5 HTTP/1.1" 200 OK
+INFO:     146.75.209.12:7624 - "GET /api/admin/collections HTTP/1.1" 200 OK
+INFO:     146.75.209.12:7508 - "DELETE /api/admin/collections/5 HTTP/1.1" 200 OK
+INFO:     146.75.209.12:7508 - "GET /api/admin/collections HTTP/1.1" 200 OK

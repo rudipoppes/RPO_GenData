@@ -8,19 +8,9 @@ interface DeleteConfirmationDialogProps {
   collections: Collection[];
   onConfirm: () => void;
   onCancel: () => void;
-  cascadeInfo: {
-    fields: number;
-    api_key_permissions: number;
-  };
 }
 
-function DeleteConfirmationDialog({ 
-  isOpen, 
-  collections, 
-  onConfirm, 
-  onCancel, 
-  cascadeInfo 
-}: DeleteConfirmationDialogProps) {
+function DeleteConfirmationDialog({ isOpen, collections, onConfirm, onCancel }: DeleteConfirmationDialogProps) {
   if (!isOpen) return null;
 
   return (
@@ -35,18 +25,10 @@ function DeleteConfirmationDialog({
           <h3 className="text-lg leading-6 font-medium text-gray-900">Delete Collections</h3>
           <div className="mt-2 px-7 py-3">
             <p className="text-sm text-gray-500">
-              Are you sure you want to delete {collections.length} collection{collections.length > 1 ? 's' : ''}?
+              Are you sure you want to delete {collections.length} collection{collections.length > 1 ? 's' : ''}? This action cannot be undone and will also delete all fields in the collection{collections.length > 1 ? 's' : ''}.
             </p>
-            <div className="mt-4 p-3 bg-yellow-50 rounded-md">
-              <h4 className="text-sm font-medium text-yellow-800">This will also delete:</h4>
-              <ul className="mt-2 text-sm text-yellow-700">
-                <li>• {cascadeInfo.fields} field{cascadeInfo.fields !== 1 ? 's' : ''}</li>
-                <li>• {cascadeInfo.api_key_permissions} API key permission{cascadeInfo.api_key_permissions !== 1 ? 's' : ''}</li>
-              </ul>
-            </div>
             <div className="mt-4 max-h-32 overflow-y-auto">
-              <h4 className="text-sm font-medium text-gray-700">Collections to delete:</h4>
-              <ul className="text-left text-sm text-gray-600 mt-1">
+              <ul className="text-left text-sm text-gray-700">
                 {collections.map((collection) => (
                   <li key={collection.id} className="py-1">• {collection.name}</li>
                 ))}
@@ -81,7 +63,6 @@ export default function Collections() {
   const [selectedCollections, setSelectedCollections] = useState<Set<number>>(new Set());
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [deleting, setDeleting] = useState(false);
-  const [cascadeInfo, setCascadeInfo] = useState({ fields: 0, api_key_permissions: 0 });
 
   useEffect(() => {
     loadCollections();
@@ -90,7 +71,6 @@ export default function Collections() {
   const loadCollections = async () => {
     try {
       setLoading(true);
-      setError('');
       const data = await collectionsApi.list();
       setCollections(data);
     } catch (err: any) {
@@ -163,35 +143,13 @@ export default function Collections() {
     }
   };
 
-  const calculateCascadeInfo = (selectedCollectionIds: number[]) => {
-    const selectedCollectionObjects = collections.filter(c => selectedCollectionIds.includes(c.id));
-    
-    let totalFields = 0;
-    let totalApiKeyPermissions = 0;
-    
-    selectedCollectionObjects.forEach(collection => {
-      totalFields += collection.fields?.length || 0;
-      // Note: We don't have API key permission count in the frontend data
-      // The backend will provide this info in the response
-    });
-    
-    return {
-      fields: totalFields,
-      api_key_permissions: totalApiKeyPermissions // Will be updated by backend response
-    };
-  };
-
   const handleDeleteClick = () => {
-    const selectedIds = Array.from(selectedCollections);
-    const cascade = calculateCascadeInfo(selectedIds);
-    setCascadeInfo(cascade);
     setShowDeleteDialog(true);
   };
 
   const handleDeleteConfirm = async () => {
     const selectedIds = Array.from(selectedCollections);
     setDeleting(true);
-    setError('');
     
     try {
       if (selectedIds.length === 1) {
@@ -206,10 +164,7 @@ export default function Collections() {
       setSelectedCollections(new Set()); // Clear selection
       setShowDeleteDialog(false);
     } catch (err: any) {
-      console.error('Delete failed:', err);
-      const errorMessage = err.response?.data?.detail || err.message || 'Failed to delete collections';
-      setError(errorMessage);
-      setShowDeleteDialog(false);
+      setError(err.response?.data?.detail || 'Failed to delete collections');
     } finally {
       setDeleting(false);
     }
@@ -267,7 +222,7 @@ export default function Collections() {
               <label className="flex items-center">
                 <input
                   type="checkbox"
-                  checked={selectedCollections.size === filteredCollections.length && filteredCollections.length > 0}
+                  checked={selectedCollections.size === filteredCollections.length}
                   onChange={toggleSelectAll}
                   className="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
                 />
@@ -349,17 +304,14 @@ export default function Collections() {
                         : "border-gray-300 bg-white"
                   }`}
                 >
-                  {/* Checkbox - positioned to avoid card click area */}
-                  <div className="absolute top-3 left-3 z-10">
+                  {/* Checkbox */}
+                  <div className="absolute top-3 left-3">
                     <input
                       type="checkbox"
                       checked={isSelected}
-                      onChange={(e) => {
-                        e.stopPropagation();
-                        toggleSelection(collection.id);
-                      }}
-                      onClick={(e) => e.stopPropagation()}
+                      onChange={() => toggleSelection(collection.id)}
                       className="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                      onClick={(e) => e.stopPropagation()}
                     />
                   </div>
 
@@ -380,23 +332,18 @@ export default function Collections() {
                       </div>
                     </div>
                     <div className="flex-1 min-w-0">
-                      {/* Make only the title clickable, not the entire card */}
-                      <Link 
-                        to={`/collections/${collection.id}`} 
-                        className="block hover:text-blue-600 focus:outline-none"
-                      >
-                        <p className="text-lg font-medium text-gray-900 truncate hover:text-blue-600 transition-colors">
-                          {collection.name}
+                      <Link to={`/collections/${collection.id}`} className="focus:outline-none">
+                        <span className="absolute inset-0" aria-hidden="true" />
+                        <p className="text-lg font-medium text-gray-900 truncate">{collection.name}</p>
+                        <p className="text-sm text-gray-500">
+                          {collection.fields?.length || 0} field{(collection.fields?.length || 0) !== 1 ? 's' : ''}
                         </p>
+                        {collection.owner_username && (
+                          <p className="text-xs text-gray-400">
+                            Owner: {collection.owner_username}
+                          </p>
+                        )}
                       </Link>
-                      <p className="text-sm text-gray-500">
-                        {collection.fields?.length || 0} field{(collection.fields?.length || 0) !== 1 ? 's' : ''}
-                      </p>
-                      {collection.owner_username && (
-                        <p className="text-xs text-gray-400">
-                          Owner: {collection.owner_username}
-                        </p>
-                      )}
                     </div>
                   </div>
                   
@@ -413,12 +360,14 @@ export default function Collections() {
                     <Link
                       to={`/collections/${collection.id}`}
                       className="text-blue-600 hover:text-blue-500 text-sm font-medium"
+                      onClick={(e) => e.stopPropagation()}
                     >
                       View Details
                     </Link>
                     <Link
                       to={`/collections/${collection.id}/edit`}
                       className="text-gray-400 hover:text-gray-600 focus:outline-none focus:text-gray-600"
+                      onClick={(e) => e.stopPropagation()}
                     >
                       <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -426,7 +375,7 @@ export default function Collections() {
                     </Link>
                   </div>
                 </div>
-              );})}
+);})}
             </div>
           )}
         </div>
@@ -437,7 +386,6 @@ export default function Collections() {
         collections={selectedCollectionObjects}
         onConfirm={handleDeleteConfirm}
         onCancel={handleDeleteCancel}
-        cascadeInfo={cascadeInfo}
       />
     </div>
   );

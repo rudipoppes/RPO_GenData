@@ -2,7 +2,6 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session, joinedload
 from sqlalchemy.exc import IntegrityError
 from typing import List
-from pydantic import BaseModel
 
 from app.db.database import get_db
 from app.models.user import User
@@ -175,87 +174,6 @@ async def update_collection(
         created_at=collection.created_at,
         updated_at=collection.updated_at
     )
-
-from typing import List
-
-class BulkDeleteCollectionsRequest(BaseModel):
-    collection_ids: List[int]
-
-@router.delete("/collections/bulk")
-async def bulk_delete_collections(
-    request: BulkDeleteCollectionsRequest,
-    current_user: User = Depends(get_current_admin_or_editor_user),
-    db: Session = Depends(get_db)
-):
-    """Delete multiple collections and their associated fields and API key permissions."""
-    from app.models.user import UserRole
-    
-    collection_ids = request.collection_ids
-    
-    if not collection_ids:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="No collection IDs provided"
-        )
-    
-    # Fetch all collections to be deleted with their owners
-    collections = db.query(Collection).options(joinedload(Collection.owner)).filter(
-        Collection.id.in_(collection_ids)
-    ).all()
-    
-    # Check if all requested collections exist
-    found_ids = {c.id for c in collections}
-    missing_ids = set(collection_ids) - found_ids
-    if missing_ids:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Collections not found: {sorted(list(missing_ids))}"
-        )
-    
-    # Check access permissions for all collections
-    denied_collections = []
-    for collection in collections:
-        if current_user.role != UserRole.ADMIN and collection.owner_id != current_user.id:
-            denied_collections.append(collection.name)
-    
-    if denied_collections:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail=f"Access denied to collections: {denied_collections}"
-        )
-    
-    # Count associated records that will be deleted
-    total_fields = 0
-    total_api_keys = 0
-    
-    for collection in collections:
-        # Count fields
-        field_count = db.query(Field).filter(Field.collection_id == collection.id).count()
-        total_fields += field_count
-        
-        # Count API key permissions
-        from app.models.api_key import APIKeyAllowed
-        api_key_count = db.query(APIKeyAllowed).filter(
-            APIKeyAllowed.collection_id == collection.id
-        ).count()
-        total_api_keys += api_key_count
-    
-    # Delete all collections (cascade will handle fields and API key permissions)
-    deleted_names = [c.name for c in collections]
-    for collection in collections:
-        db.delete(collection)
-    
-    db.commit()
-    
-    return {
-        "message": f"Successfully deleted {len(collections)} collection(s)",
-        "deleted_collections": deleted_names,
-        "deleted_count": len(collections),
-        "cascade_deleted": {
-            "fields": total_fields,
-            "api_key_permissions": total_api_keys
-        }
-    }
 
 @router.delete("/collections/{collection_id}")
 async def delete_collection(
@@ -442,3 +360,83 @@ async def delete_field(
     return {"message": "Field deleted successfully"}
 
 from pydantic import BaseModel
+from typing import List
+
+class BulkDeleteCollectionsRequest(BaseModel):
+    collection_ids: List[int]
+
+@router.delete("/collections/bulk")
+async def bulk_delete_collections(
+    request: BulkDeleteCollectionsRequest,
+    current_user: User = Depends(get_current_admin_or_editor_user),
+    db: Session = Depends(get_db)
+):
+    """Delete multiple collections and their associated fields and API key permissions."""
+    from app.models.user import UserRole
+    
+    collection_ids = request.collection_ids
+    
+    if not collection_ids:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="No collection IDs provided"
+        )
+    
+    # Fetch all collections to be deleted with their owners
+    collections = db.query(Collection).options(joinedload(Collection.owner)).filter(
+        Collection.id.in_(collection_ids)
+    ).all()
+    
+    # Check if all requested collections exist
+    found_ids = {c.id for c in collections}
+    missing_ids = set(collection_ids) - found_ids
+    if missing_ids:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Collections not found: {sorted(list(missing_ids))}"
+        )
+    
+    # Check access permissions for all collections
+    denied_collections = []
+    for collection in collections:
+        if current_user.role != UserRole.ADMIN and collection.owner_id != current_user.id:
+            denied_collections.append(collection.name)
+    
+    if denied_collections:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=f"Access denied to collections: {denied_collections}"
+        )
+    
+    # Count associated records that will be deleted
+    total_fields = 0
+    total_api_keys = 0
+    
+    for collection in collections:
+        # Count fields
+        field_count = db.query(Field).filter(Field.collection_id == collection.id).count()
+        total_fields += field_count
+        
+        # Count API key permissions
+        from app.models.api_key import APIKeyAllowed
+        api_key_count = db.query(APIKeyAllowed).filter(
+            APIKeyAllowed.collection_id == collection.id
+        ).count()
+        total_api_keys += api_key_count
+    
+    # Delete all collections (cascade will handle fields and API key permissions)
+    deleted_names = [c.name for c in collections]
+    for collection in collections:
+        db.delete(collection)
+    
+    db.commit()
+    
+    return {
+        "message": f"Successfully deleted {len(collections)} collection(s)",
+        "deleted_collections": deleted_names,
+        "deleted_count": len(collections),
+        "cascade_deleted": {
+            "fields": total_fields,
+            "api_key_permissions": total_api_keys
+        }
+    }
