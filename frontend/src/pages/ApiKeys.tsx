@@ -119,7 +119,7 @@ export default function ApiKeys() {
                     <div className="flex-1">
                       <div className="flex items-center">
                         <div className="font-medium text-gray-900">
-                          {apiKey.name}
+                          {apiKey.key_name}
                         </div>
                         <span className={`ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                           apiKey.is_active 
@@ -130,8 +130,8 @@ export default function ApiKeys() {
                         </span>
                       </div>
                       <div className="mt-1 text-sm text-gray-500">
-                        <div>Key: {apiKey.key_prefix}••••</div>
-                        <div>Scopes: {apiKey.scopes.join(', ')}</div>
+                        <div>Key: {apiKey.key_hash.substring(0, 8)}••••</div>
+                        <div>Scopes: {'API Access'}</div>
                         <div>Created: {new Date(apiKey.created_at).toLocaleDateString()}</div>
                         {apiKey.expires_at && (
                           <div>Expires: {new Date(apiKey.expires_at).toLocaleDateString()}</div>
@@ -187,7 +187,7 @@ function CreateApiKeyForm({
     const keyData: CreateAPIKeyRequest = {
       name,
       scopes,
-      allowed_collections: [], // For now, allow all collections
+      
       expires_at: expiresAt || undefined
     };
 
@@ -218,7 +218,7 @@ function CreateApiKeyForm({
               Your API key has been created. Make sure to copy it now - you won't be able to see it again.
             </p>
             <div className="bg-gray-50 p-3 rounded-md border">
-              <code className="text-sm font-mono">{createdKey.key}</code>
+              <code className="text-sm font-mono">{createdKey.api_key}</code>
             </div>
           </div>
           <div className="flex justify-end">

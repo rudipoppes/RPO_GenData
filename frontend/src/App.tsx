@@ -6,6 +6,7 @@ import Dashboard from './pages/Dashboard';
 import Collections from './pages/Collections';
 import CollectionDetail from './pages/CollectionDetail';
 import CreateCollection from './pages/CreateCollection';
+import EditCollection from './pages/EditCollection';
 import ApiKeys from './pages/ApiKeys';
 import Samples from './pages/Samples';
 
@@ -54,7 +55,7 @@ function AuthenticatedApp() {
                 <Route path="/collections" element={<Collections />} />
                 <Route path="/collections/new" element={<CreateCollection />} />
                 <Route path="/collections/:id" element={<CollectionDetail />} />
-                <Route path="/collections/:id/edit" element={<CreateCollection />} />
+                <Route path="/collections/:id/edit" element={<EditCollection />} />
                 <Route path="/api-keys" element={<ApiKeys />} />
                 <Route path="/samples" element={<Samples />} />
                 <Route path="*" element={<Navigate to="/" replace />} />

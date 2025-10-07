@@ -30,7 +30,7 @@ export default function Login() {
     setLoading(true);
 
     try {
-      await login({ email, password });
+      await login({ username: email, password });
       navigate('/', { replace: true });
     } catch (err: any) {
       console.error('Login error:', err);

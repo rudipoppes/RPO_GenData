@@ -1,12 +1,6 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { apiService } from '../services/api';
-
-interface User {
-  id: number;
-  username: string;
-  email: string;
-  role: string;
-}
+import type { User } from '../types/api';
 
 interface AuthContextType {
   user: User | null;
@@ -17,47 +11,48 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-interface AuthProviderProps {
-  children: ReactNode;
-}
-
-export function AuthProvider({ children }: AuthProviderProps) {
+export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    checkAuthStatus();
+    // Check if user is already logged in
+    const token = localStorage.getItem('token');
+    if (token) {
+      // Try to get user data
+      fetchUser();
+    } else {
+      setLoading(false);
+    }
   }, []);
 
-  const checkAuthStatus = async () => {
+  const fetchUser = async () => {
     try {
       const userData = await apiService.getCurrentUser();
       setUser(userData);
     } catch (error) {
-      console.log('Not authenticated');
+      console.error('Failed to fetch user:', error);
+      localStorage.removeItem('token');
     } finally {
       setLoading(false);
     }
   };
 
   const login = async (email: string, password: string) => {
-    await apiService.login({ email, password });
-    await checkAuthStatus();
+    await apiService.login({ username: email, password });
+    await fetchUser();
   };
 
   const logout = () => {
-    apiService.logout();
+    localStorage.removeItem('token');
     setUser(null);
   };
 
-  const value = {
-    user,
-    loading,
-    login,
-    logout,
-  };
-
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={{ user, loading, login, logout }}>
+      {children}
+    </AuthContext.Provider>
+  );
 }
 
 export function useAuth() {

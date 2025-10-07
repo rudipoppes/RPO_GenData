@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { collectionsApi, fieldsApi } from '../services/api';
-import type { Collection, Field } from '../types/api';
+import type { Collection, Field, CreateFieldRequest } from '../types/api';
 
 export default function CollectionDetail() {
   const { id } = useParams<{ id: string }>();
@@ -14,9 +14,10 @@ export default function CollectionDetail() {
   const [showAddField, setShowAddField] = useState(false);
   
   // New field form state
-  const [newField, setNewField] = useState({
-    name: '',
-    value_type: 'TEXT_FIXED' as const
+  const [newField, setNewField] = useState<CreateFieldRequest>({
+    collection_type: 'Performance',
+    field_name: '',
+    value_type: 'TEXT_FIXED'
   });
 
   const collectionId = parseInt(id || '0');
@@ -26,6 +27,10 @@ export default function CollectionDetail() {
       loadCollection();
     }
   }, [collectionId]);
+
+  useEffect(() => {
+    setNewField(prev => ({ ...prev, collection_type: activeTab }));
+  }, [activeTab]);
 
   const loadCollection = async () => {
     try {
@@ -55,18 +60,86 @@ export default function CollectionDetail() {
 
   const handleAddField = async () => {
     try {
-      await fieldsApi.create(collectionId, {
+      // Validate required fields based on value_type
+      const fieldData: CreateFieldRequest = {
         collection_type: activeTab,
-        field_name: newField.name,
+        field_name: newField.field_name,
         value_type: newField.value_type
-      });
+      };
+
+      // Add required configuration based on field type
+      switch (newField.value_type) {
+        case 'TEXT_FIXED':
+          if (!newField.fixed_value_text?.trim()) {
+            setError('Fixed text value is required for TEXT_FIXED fields');
+            return;
+          }
+          fieldData.fixed_value_text = newField.fixed_value_text;
+          break;
+          
+        case 'NUMBER_FIXED':
+          if (newField.fixed_value_number === undefined || newField.fixed_value_number === null) {
+            setError('Fixed number value is required for NUMBER_FIXED fields');
+            return;
+          }
+          fieldData.fixed_value_number = newField.fixed_value_number;
+          break;
+          
+        case 'FLOAT_FIXED':
+          if (newField.fixed_value_float === undefined || newField.fixed_value_float === null) {
+            setError('Fixed float value is required for FLOAT_FIXED fields');
+            return;
+          }
+          fieldData.fixed_value_float = newField.fixed_value_float;
+          break;
+          
+        case 'NUMBER_RANGE':
+          if (newField.range_start_number === undefined || newField.range_end_number === undefined) {
+            setError('Start and end values are required for NUMBER_RANGE fields');
+            return;
+          }
+          fieldData.range_start_number = newField.range_start_number;
+          fieldData.range_end_number = newField.range_end_number;
+          break;
+          
+        case 'FLOAT_RANGE':
+          if (newField.range_start_float === undefined || newField.range_end_float === undefined) {
+            setError('Start and end values are required for FLOAT_RANGE fields');
+            return;
+          }
+          fieldData.range_start_float = newField.range_start_float;
+          fieldData.range_end_float = newField.range_end_float;
+          fieldData.float_precision = newField.float_precision || 2;
+          break;
+          
+        case 'INCREMENT':
+        case 'DECREMENT':
+          if (newField.start_number === undefined || newField.step_number === undefined) {
+            setError('Start and step values are required for INCREMENT/DECREMENT fields');
+            return;
+          }
+          fieldData.start_number = newField.start_number;
+          fieldData.step_number = newField.step_number;
+          if (newField.reset_number !== undefined) {
+            fieldData.reset_number = newField.reset_number;
+          }
+          break;
+          
+        case 'EPOCH_NOW':
+          // No additional configuration needed
+          break;
+      }
+
+      await fieldsApi.create(collectionId, fieldData);
       
       // Reset form
       setNewField({
-        name: '',
+        collection_type: activeTab,
+        field_name: '',
         value_type: 'TEXT_FIXED'
       });
       setShowAddField(false);
+      setError('');
       await loadCollection();
     } catch (err: any) {
       setError(err.response?.data?.detail || 'Failed to create field');
@@ -74,11 +147,213 @@ export default function CollectionDetail() {
   };
 
   const getFilteredFields = () => {
-    return fields.filter(_field => {
-      // For now, show all fields under both tabs
-      // This can be enhanced to filter by collection_type when that field is available
-      return true;
-    });
+    return fields.filter(field => field.collection_type === activeTab);
+  };
+
+  const renderFieldConfiguration = (field: Field) => {
+    const config: string[] = [];
+    
+    switch (field.value_type) {
+      case 'TEXT_FIXED':
+        if (field.fixed_value_text) config.push(`Text: "${field.fixed_value_text}"`);
+        break;
+      case 'NUMBER_FIXED':
+        if (field.fixed_value_number !== undefined) config.push(`Number: ${field.fixed_value_number}`);
+        break;
+      case 'FLOAT_FIXED':
+        if (field.fixed_value_float !== undefined) config.push(`Float: ${field.fixed_value_float}`);
+        break;
+      case 'NUMBER_RANGE':
+        if (field.range_start_number !== undefined && field.range_end_number !== undefined) {
+          config.push(`Range: ${field.range_start_number} - ${field.range_end_number}`);
+        }
+        break;
+      case 'FLOAT_RANGE':
+        if (field.range_start_float !== undefined && field.range_end_float !== undefined) {
+          config.push(`Range: ${field.range_start_float} - ${field.range_end_float}`);
+          config.push(`Precision: ${field.float_precision || 2}`);
+        }
+        break;
+      case 'INCREMENT':
+      case 'DECREMENT':
+        if (field.start_number !== undefined) config.push(`Start: ${field.start_number}`);
+        if (field.step_number !== undefined) config.push(`Step: ${field.step_number}`);
+        if (field.reset_number !== undefined) config.push(`Reset: ${field.reset_number}`);
+        if (field.current_number !== undefined) config.push(`Current: ${field.current_number}`);
+        break;
+      case 'EPOCH_NOW':
+        config.push('Current timestamp');
+        break;
+    }
+    
+    return config.length > 0 ? config.join(', ') : 'No configuration';
+  };
+
+  const renderFieldConfigInputs = () => {
+    switch (newField.value_type) {
+      case 'TEXT_FIXED':
+        return (
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Fixed Text Value *</label>
+            <input
+              type="text"
+              className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
+              value={newField.fixed_value_text || ''}
+              onChange={(e) => setNewField({...newField, fixed_value_text: e.target.value})}
+              placeholder="Enter text value"
+            />
+          </div>
+        );
+        
+      case 'NUMBER_FIXED':
+        return (
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Fixed Number Value *</label>
+            <input
+              type="number"
+              className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
+              value={newField.fixed_value_number || ''}
+              onChange={(e) => setNewField({...newField, fixed_value_number: parseInt(e.target.value)})}
+              placeholder="Enter number value"
+            />
+          </div>
+        );
+        
+      case 'FLOAT_FIXED':
+        return (
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Fixed Float Value *</label>
+            <input
+              type="number"
+              step="any"
+              className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
+              value={newField.fixed_value_float || ''}
+              onChange={(e) => setNewField({...newField, fixed_value_float: parseFloat(e.target.value)})}
+              placeholder="Enter float value"
+            />
+          </div>
+        );
+        
+      case 'NUMBER_RANGE':
+        return (
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Start Number *</label>
+              <input
+                type="number"
+                className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
+                value={newField.range_start_number || ''}
+                onChange={(e) => setNewField({...newField, range_start_number: parseInt(e.target.value)})}
+                placeholder="Min value"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">End Number *</label>
+              <input
+                type="number"
+                className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
+                value={newField.range_end_number || ''}
+                onChange={(e) => setNewField({...newField, range_end_number: parseInt(e.target.value)})}
+                placeholder="Max value"
+              />
+            </div>
+          </div>
+        );
+        
+      case 'FLOAT_RANGE':
+        return (
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Start Float *</label>
+                <input
+                  type="number"
+                  step="any"
+                  className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
+                  value={newField.range_start_float || ''}
+                  onChange={(e) => setNewField({...newField, range_start_float: parseFloat(e.target.value)})}
+                  placeholder="Min value"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">End Float *</label>
+                <input
+                  type="number"
+                  step="any"
+                  className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
+                  value={newField.range_end_float || ''}
+                  onChange={(e) => setNewField({...newField, range_end_float: parseFloat(e.target.value)})}
+                  placeholder="Max value"
+                />
+              </div>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Float Precision</label>
+              <input
+                type="number"
+                min="0"
+                max="10"
+                className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
+                value={newField.float_precision || 2}
+                onChange={(e) => setNewField({...newField, float_precision: parseInt(e.target.value)})}
+                placeholder="Decimal places"
+              />
+            </div>
+          </div>
+        );
+        
+      case 'INCREMENT':
+      case 'DECREMENT':
+        return (
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Start Value *</label>
+                <input
+                  type="number"
+                  step="any"
+                  className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
+                  value={newField.start_number || ''}
+                  onChange={(e) => setNewField({...newField, start_number: parseFloat(e.target.value)})}
+                  placeholder="Starting number"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Step Value *</label>
+                <input
+                  type="number"
+                  step="any"
+                  className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
+                  value={newField.step_number || ''}
+                  onChange={(e) => setNewField({...newField, step_number: parseFloat(e.target.value)})}
+                  placeholder="Increment/decrement by"
+                />
+              </div>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Reset Value (Optional)</label>
+              <input
+                type="number"
+                step="any"
+                className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
+                value={newField.reset_number || ''}
+                onChange={(e) => setNewField({...newField, reset_number: parseFloat(e.target.value)})}
+                placeholder="Reset to this value when reached"
+              />
+            </div>
+          </div>
+        );
+        
+      case 'EPOCH_NOW':
+        return (
+          <div className="text-sm text-gray-500">
+            This field type generates the current Unix timestamp. No additional configuration is needed.
+          </div>
+        );
+        
+      default:
+        return null;
+    }
   };
 
   if (loading) {
@@ -107,9 +382,9 @@ export default function CollectionDetail() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">{collection.name}</h1>
-            {collection.description && (
-              <p className="mt-2 text-gray-600">{collection.description}</p>
-            )}
+            <p className="mt-2 text-gray-600">
+              Manage fields and configuration for this collection
+            </p>
           </div>
           <div className="flex space-x-3">
             <Link
@@ -196,15 +471,15 @@ export default function CollectionDetail() {
                   {getFilteredFields().map((field) => (
                     <tr key={field.id}>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                        {field.name}
+                        {field.field_name}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
                           {field.value_type}
                         </span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {JSON.stringify(field.value_config)}
+                      <td className="px-6 py-4 text-sm text-gray-500">
+                        {renderFieldConfiguration(field)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <button
@@ -226,12 +501,20 @@ export default function CollectionDetail() {
       {/* Add Field Modal/Form */}
       {showAddField && (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-          <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+          <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white max-h-[80vh] overflow-y-auto">
             <div className="mt-3">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-medium text-gray-900">Add New Field</h3>
                 <button
-                  onClick={() => setShowAddField(false)}
+                  onClick={() => {
+                    setShowAddField(false);
+                    setError('');
+                    setNewField({
+                      collection_type: activeTab,
+                      field_name: '',
+                      value_type: 'TEXT_FIXED'
+                    });
+                  }}
                   className="text-gray-400 hover:text-gray-600"
                 >
                   <span className="sr-only">Close</span>
@@ -243,18 +526,18 @@ export default function CollectionDetail() {
               
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Field Name</label>
+                  <label className="block text-sm font-medium text-gray-700">Field Name *</label>
                   <input
                     type="text"
                     className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
-                    value={newField.name}
-                    onChange={(e) => setNewField({...newField, name: e.target.value})}
+                    value={newField.field_name}
+                    onChange={(e) => setNewField({...newField, field_name: e.target.value})}
                     placeholder="Enter field name"
                   />
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Value Type</label>
+                  <label className="block text-sm font-medium text-gray-700">Value Type *</label>
                   <select
                     className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
                     value={newField.value_type}
@@ -270,18 +553,28 @@ export default function CollectionDetail() {
                     <option value="DECREMENT">Auto Decrement</option>
                   </select>
                 </div>
+
+                {renderFieldConfigInputs()}
               </div>
 
               <div className="flex justify-end space-x-3 mt-6">
                 <button
-                  onClick={() => setShowAddField(false)}
+                  onClick={() => {
+                    setShowAddField(false);
+                    setError('');
+                    setNewField({
+                      collection_type: activeTab,
+                      field_name: '',
+                      value_type: 'TEXT_FIXED'
+                    });
+                  }}
                   className="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleAddField}
-                  disabled={!newField.name}
+                  disabled={!newField.field_name}
                   className="bg-blue-600 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
                 >
                   Add Field
