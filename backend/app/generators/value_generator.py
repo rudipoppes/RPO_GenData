@@ -41,45 +41,43 @@ class ValueGenerator:
     @staticmethod
     def _handle_increment(field: Field, db: Session) -> float:
         """Handle INCREMENT value generation with persistence."""
-        # If current is NULL, set to start
+        # If current is NULL, set to start and return it
         if field.current_number is None:
-            field.current_number = field.start_number
-            db.commit()
-            return field.current_number
-        
-        # Return current value and calculate next
-        current_value = field.current_number
-        next_value = current_value + field.step_number
-        
-        # Check if next value exceeds reset threshold
-        if next_value > field.reset_number:
-            field.current_number = field.start_number
+            current_value = field.start_number
+            field.current_number = current_value + field.step_number
         else:
-            field.current_number = next_value
+            # Return current value and calculate next
+            current_value = field.current_number
+            next_value = current_value + field.step_number
+            
+            # Check if next value exceeds reset threshold
+            if next_value > field.reset_number:
+                field.current_number = field.start_number + field.step_number
+            else:
+                field.current_number = next_value
         
-        db.commit()
+        db.flush()
         return current_value
     
     @staticmethod
     def _handle_decrement(field: Field, db: Session) -> float:
         """Handle DECREMENT value generation with persistence."""
-        # If current is NULL, set to start
+        # If current is NULL, set to start and return it
         if field.current_number is None:
-            field.current_number = field.start_number
-            db.commit()
-            return field.current_number
-        
-        # Return current value and calculate next
-        current_value = field.current_number
-        next_value = current_value - field.step_number
-        
-        # Check if next value falls below reset threshold
-        if next_value < field.reset_number:
-            field.current_number = field.start_number
+            current_value = field.start_number
+            field.current_number = current_value - field.step_number
         else:
-            field.current_number = next_value
+            # Return current value and calculate next
+            current_value = field.current_number
+            next_value = current_value - field.step_number
+            
+            # Check if next value falls below reset threshold
+            if next_value < field.reset_number:
+                field.current_number = field.start_number - field.step_number
+            else:
+                field.current_number = next_value
         
-        db.commit()
+        db.flush()
         return current_value
 
     @staticmethod

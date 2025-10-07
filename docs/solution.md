@@ -1,7 +1,7 @@
-# RPO_GenData – Architecture and Implementation Plan
+# RPO_RPO_GenData – Architecture and Implementation Plan
 
 ## 1) Overview
-RPO_GenData is a small, maintainable system that lets users define collections and fields with generation rules (epoch time, ranges, increment/decrement) or fixed values (text/number/float). The API returns computed JSON on demand and persists only the state required for increment/decrement fields.
+RPO_RPO_GenData is a small, maintainable system that lets users define collections and fields with generation rules (epoch time, ranges, increment/decrement) or fixed values (text/number/float). The API returns computed JSON on demand and persists only the state required for increment/decrement fields.
 
 - Public API: GET /api/{Collection_Name}/{Collection_Type}
 - Admin UI: React + Vite SPA, served by the backend under /admin
@@ -227,7 +227,7 @@ Guidance:
 ## 11) Deployment & operations
 - Single service on 0.0.0.0:8088 via Uvicorn.
 - Systemd unit for auto-restart and logs.
-- SQLite DB file at /home/ubuntu/RPO_GenData/data/gendata.db.
+- SQLite DB file at /home/ubuntu/RPO_RPO_GenData/data/gendata.db.
 - Backups: occasional copy of the DB file.
 
 ## 12) Security
