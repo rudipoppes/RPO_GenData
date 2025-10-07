@@ -82,13 +82,10 @@ export const apiKeysApi = {
     api.put(`/admin/api-keys/${id}`, keyData).then(res => res.data),
 
   revoke: (id: number): Promise<void> =>
-    api.post(`/admin/api-keys/${id}/revoke`).then(res => res.data),
+    api.put(`/admin/api-keys/${id}/revoke`).then(res => res.data),
 
   delete: (id: number): Promise<void> =>
     api.delete(`/admin/api-keys/${id}`).then(res => res.data),
-
-  getAllowedCollections: (id: number): Promise<any[]> =>
-    api.get(`/admin/api-keys/${id}/allowed-collections`).then(res => res.data),
 };
 
 export default api;

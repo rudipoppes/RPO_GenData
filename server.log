@@ -11,43 +11,69 @@ Default admin credentials:
 
 INFO:     Will watch for changes in these directories: ['/home/ubuntu/RPO_GenData/backend']
 INFO:     Uvicorn running on http://0.0.0.0:8088 (Press CTRL+C to quit)
-INFO:     Started reloader process [543896] using WatchFiles
+INFO:     Started reloader process [557372] using WatchFiles
 Initializing database...
 Database already has 2 users
 Starting RPO GenData server on 0.0.0.0:8088
-INFO:     Started server process [543987]
+INFO:     Started server process [557491]
 INFO:     Waiting for application startup.
 INFO:     Application startup complete.
-INFO:     146.75.209.12:7620 - "GET /collections HTTP/1.1" 200 OK
-INFO:     146.75.209.12:7540 - "GET /index-21410e86.css HTTP/1.1" 304 Not Modified
-INFO:     146.75.209.12:7620 - "GET /index-fd6b00b6.js HTTP/1.1" 304 Not Modified
-INFO:     146.75.209.12:7540 - "GET /api/auth/me HTTP/1.1" 200 OK
-INFO:     146.75.209.12:7620 - "GET /api/admin/collections HTTP/1.1" 200 OK
-INFO:     146.75.209.12:7648 - "GET /collections HTTP/1.1" 200 OK
-INFO:     146.75.209.12:7648 - "GET /api/auth/me HTTP/1.1" 200 OK
-INFO:     146.75.209.12:7648 - "GET /api/admin/collections HTTP/1.1" 200 OK
-INFO:     146.75.209.12:7654 - "DELETE /api/admin/collections/bulk HTTP/1.1" 200 OK
-INFO:     146.75.209.12:7654 - "GET /api/admin/collections HTTP/1.1" 200 OK
-INFO:     146.75.209.12:7624 - "POST /api/admin/collections HTTP/1.1" 200 OK
-INFO:     146.75.209.12:7624 - "GET /api/admin/collections/5 HTTP/1.1" 200 OK
-INFO:     146.75.209.12:7624 - "POST /api/admin/collections/5/fields HTTP/1.1" 200 OK
-INFO:     146.75.209.12:7624 - "GET /api/admin/collections/5 HTTP/1.1" 200 OK
-INFO:     146.75.209.12:7624 - "GET /api/admin/collections HTTP/1.1" 200 OK
-INFO:     146.75.209.12:7508 - "DELETE /api/admin/collections/5 HTTP/1.1" 200 OK
-INFO:     146.75.209.12:7508 - "GET /api/admin/collections HTTP/1.1" 200 OK
-INFO:     146.75.209.13:15239 - "GET /api/admin/api-keys HTTP/1.1" 200 OK
-INFO:     205.210.31.8:60120 - "GET / HTTP/1.1" 200 OK
-INFO:     146.75.209.13:15229 - "POST /api/admin/api-keys HTTP/1.1" 401 Unauthorized
-INFO:     146.75.209.13:15229 - "GET /api-keys HTTP/1.1" 200 OK
-INFO:     146.75.209.13:15229 - "GET /index-21410e86.css HTTP/1.1" 304 Not Modified
-INFO:     146.75.209.13:15289 - "GET /index-fd6b00b6.js HTTP/1.1" 304 Not Modified
-INFO:     146.75.209.13:15229 - "GET /api/auth/me HTTP/1.1" 401 Unauthorized
-INFO:     146.75.209.13:15108 - "POST /api/auth/login HTTP/1.1" 200 OK
-INFO:     146.75.209.13:15108 - "GET /api/auth/me HTTP/1.1" 200 OK
-INFO:     146.75.209.13:15108 - "GET /api/admin/collections HTTP/1.1" 200 OK
-INFO:     146.75.209.13:15174 - "GET /api/admin/api-keys HTTP/1.1" 200 OK
-INFO:     146.75.209.13:15193 - "GET /api/admin/api-keys HTTP/1.1" 200 OK
-INFO:     146.75.209.13:15231 - "POST /api/admin/api-keys HTTP/1.1" 200 OK
-INFO:     146.75.209.13:15231 - "GET /api/admin/api-keys HTTP/1.1" 200 OK
-INFO:     146.75.209.13:15241 - "DELETE /api/admin/api-keys/1 HTTP/1.1" 200 OK
-INFO:     146.75.209.13:15241 - "GET /api/admin/api-keys HTTP/1.1" 200 OK
+INFO:     146.75.209.12:15989 - "GET /api-keys HTTP/1.1" 200 OK
+INFO:     146.75.209.12:15989 - "GET /index-57a8a4d2.css HTTP/1.1" 304 Not Modified
+INFO:     146.75.209.12:16014 - "GET /index-7dbde028.js HTTP/1.1" 304 Not Modified
+INFO:     146.75.209.12:15989 - "GET /api/auth/me HTTP/1.1" 200 OK
+INFO:     146.75.209.12:16014 - "GET /api/admin/api-keys HTTP/1.1" 200 OK
+INFO:     146.75.209.12:15989 - "DELETE /api/admin/api-keys/1 HTTP/1.1" 200 OK
+INFO:     146.75.209.12:16014 - "GET /api/admin/api-keys HTTP/1.1" 200 OK
+INFO:     146.75.209.12:15989 - "GET /api/admin/collections HTTP/1.1" 200 OK
+INFO:     146.75.209.12:16014 - "GET /api/admin/users HTTP/1.1" 200 OK
+INFO:     146.75.209.12:15989 - "GET /api/admin/collections HTTP/1.1" 200 OK
+INFO:     146.75.209.12:15989 - "GET /api/admin/api-keys HTTP/1.1" 200 OK
+INFO:     146.75.209.12:15989 - "GET /api/admin/collections HTTP/1.1" 200 OK
+INFO:     146.75.209.12:16093 - "POST /api/admin/api-keys HTTP/1.1" 200 OK
+INFO:     146.75.209.12:16093 - "GET /api/admin/api-keys HTTP/1.1" 200 OK
+INFO:     146.75.209.12:16043 - "DELETE /api/admin/api-keys/1 HTTP/1.1" 200 OK
+INFO:     146.75.209.12:16043 - "GET /api/admin/api-keys HTTP/1.1" 200 OK
+INFO:     146.75.209.12:15880 - "GET /api/admin/collections HTTP/1.1" 200 OK
+INFO:     146.75.209.12:15880 - "POST /api/admin/api-keys HTTP/1.1" 200 OK
+INFO:     146.75.209.12:15880 - "GET /api/admin/api-keys HTTP/1.1" 200 OK
+INFO:     146.75.209.12:16053 - "DELETE /api/admin/api-keys/1 HTTP/1.1" 200 OK
+INFO:     146.75.209.12:16053 - "GET /api/admin/api-keys HTTP/1.1" 200 OK
+INFO:     146.75.209.12:16004 - "GET /api/admin/collections HTTP/1.1" 200 OK
+INFO:     146.75.209.12:16004 - "POST /api/admin/api-keys HTTP/1.1" 200 OK
+INFO:     146.75.209.12:16004 - "GET /api/admin/api-keys HTTP/1.1" 200 OK
+INFO:     146.75.209.12:16089 - "PUT /api/admin/api-keys/1/revoke HTTP/1.1" 405 Method Not Allowed
+INFO:     146.75.209.12:16089 - "DELETE /api/admin/api-keys/1 HTTP/1.1" 200 OK
+INFO:     146.75.209.12:16089 - "GET /api/admin/api-keys HTTP/1.1" 200 OK
+INFO:     146.75.209.12:15984 - "GET /api/admin/collections HTTP/1.1" 200 OK
+INFO:     146.75.209.12:15984 - "GET /collections HTTP/1.1" 200 OK
+INFO:     146.75.209.12:15984 - "GET /index-57a8a4d2.css HTTP/1.1" 304 Not Modified
+INFO:     146.75.209.12:15891 - "GET /index-7dbde028.js HTTP/1.1" 304 Not Modified
+INFO:     146.75.209.12:15984 - "GET /api/auth/me HTTP/1.1" 200 OK
+INFO:     146.75.209.12:15891 - "GET /api/admin/collections HTTP/1.1" 200 OK
+INFO:     146.75.209.12:15929 - "GET /collections HTTP/1.1" 200 OK
+INFO:     146.75.209.12:15929 - "GET /index-0f2f014c.js HTTP/1.1" 200 OK
+INFO:     146.75.209.12:15929 - "GET /api/auth/me HTTP/1.1" 200 OK
+INFO:     146.75.209.12:15929 - "GET /api/admin/collections HTTP/1.1" 200 OK
+INFO:     146.75.209.12:15929 - "GET /api/admin/api-keys HTTP/1.1" 200 OK
+INFO:     146.75.209.12:15929 - "GET /api/admin/collections HTTP/1.1" 200 OK
+INFO:     146.75.209.12:15929 - "POST /api/admin/api-keys HTTP/1.1" 200 OK
+INFO:     146.75.209.12:15929 - "GET /api/admin/api-keys HTTP/1.1" 200 OK
+INFO:     146.75.209.12:16052 - "PUT /api/admin/api-keys/1/revoke HTTP/1.1" 405 Method Not Allowed
+INFO:     146.75.209.12:15926 - "GET /api/admin/collections HTTP/1.1" 200 OK
+INFO:     146.75.209.12:15926 - "GET /api/admin/api-keys HTTP/1.1" 200 OK
+INFO:     146.75.209.12:15914 - "GET /api/admin/collections HTTP/1.1" 200 OK
+INFO:     146.75.209.12:15939 - "POST /api/admin/api-keys HTTP/1.1" 422 Unprocessable Entity
+INFO:     146.75.209.12:16018 - "GET /api-keys HTTP/1.1" 200 OK
+INFO:     146.75.209.12:16018 - "GET /index-57a8a4d2.css HTTP/1.1" 200 OK
+INFO:     146.75.209.12:15879 - "GET /index-0f2f014c.js HTTP/1.1" 304 Not Modified
+INFO:     146.75.209.12:16018 - "GET /api/auth/me HTTP/1.1" 200 OK
+INFO:     146.75.209.12:15879 - "GET /api/admin/api-keys HTTP/1.1" 200 OK
+INFO:     146.75.209.12:16018 - "GET /api/admin/collections HTTP/1.1" 200 OK
+INFO:     146.75.209.12:16018 - "POST /api/admin/api-keys HTTP/1.1" 200 OK
+INFO:     146.75.209.12:16018 - "GET /api/admin/api-keys HTTP/1.1" 200 OK
+INFO:     146.75.209.12:16018 - "GET /api/admin/collections HTTP/1.1" 200 OK
+INFO:     146.75.209.12:16020 - "POST /api/admin/api-keys HTTP/1.1" 422 Unprocessable Entity
+INFO:     146.75.209.12:16020 - "GET /api-keys HTTP/1.1" 200 OK
+INFO:     146.75.209.12:16020 - "GET /api/auth/me HTTP/1.1" 200 OK
+INFO:     146.75.209.12:16020 - "GET /api/admin/api-keys HTTP/1.1" 200 OK

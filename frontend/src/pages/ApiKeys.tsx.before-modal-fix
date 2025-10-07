@@ -7,7 +7,6 @@ export default function ApiKeys() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [showCreateForm, setShowCreateForm] = useState(false);
-  const [keyCollections, setKeyCollections] = useState<{[key: number]: any[]}>({});
 
   useEffect(() => {
     loadApiKeys();
@@ -18,19 +17,6 @@ export default function ApiKeys() {
       setError('');
       const data = await apiKeysApi.list();
       setApiKeys(data);
-      
-      // Load collection info for each API key
-      const collections: {[key: number]: any[]} = {};
-      for (const key of data) {
-        try {
-          const keyCollections = await apiKeysApi.getAllowedCollections(key.id);
-          collections[key.id] = keyCollections;
-        } catch (err) {
-          console.warn(`Failed to load collections for API key ${key.id}`, err);
-          collections[key.id] = [];
-        }
-      }
-      setKeyCollections(collections);
     } catch (err: any) {
       setError(err.response?.data?.detail || 'Failed to load API keys');
     } finally {
@@ -42,7 +28,7 @@ export default function ApiKeys() {
     try {
       const newKey = await apiKeysApi.create(keyData);
       await loadApiKeys();
-      // Don't close form here - let the modal handle it after user acknowledges
+      setShowCreateForm(false);
       return newKey;
     } catch (err: any) {
       setError(err.response?.data?.detail || 'Failed to create API key');
@@ -146,10 +132,7 @@ export default function ApiKeys() {
                       </div>
                       <div className="mt-1 text-sm text-gray-500">
                         <div>Key: {apiKey.key_prefix}••••</div>
-                        <div>
-                          Collections: {keyCollections[apiKey.id]?.length === 0 ? 'All Collections' : 
-                            keyCollections[apiKey.id]?.map(c => c.collection_name).join(', ') || 'Loading...'}
-                        </div>
+                        <div>Scopes: {'API Access'}</div>
                         <div>Created: {new Date(apiKey.created_at).toLocaleDateString()}</div>
                         {apiKey.expires_at && (
                           <div>Expires: {new Date(apiKey.expires_at).toLocaleDateString()}</div>
@@ -222,7 +205,7 @@ function CreateApiKeyForm({
 
     const keyData: CreateAPIKeyRequest = {
       label: name,
-      expires_at: expiresAt ? expiresAt + 'T23:59:59.000Z' : undefined,
+      expires_at: expiresAt || undefined,
       collection_ids: allCollections ? undefined : selectedCollections
     };
 
@@ -255,10 +238,6 @@ function CreateApiKeyForm({
 
   const handleComplete = () => {
     if (acknowledged) {
-      // Reset form states
-      setCreatedKey(null);
-      setAcknowledged(false);
-      setCopied(false);
       onCancel();
     }
   };
