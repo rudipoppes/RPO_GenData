@@ -226,11 +226,19 @@ async def bulk_delete_collections(
     
     # Count associated records that will be deleted
     total_fields = 0
+    total_api_keys = 0
     
     for collection in collections:
         # Count fields
         field_count = db.query(Field).filter(Field.collection_id == collection.id).count()
         total_fields += field_count
+        
+        # Count API key permissions
+        from app.models.api_key import APIKeyAllowed
+        api_key_count = db.query(APIKeyAllowed).filter(
+            APIKeyAllowed.collection_id == collection.id
+        ).count()
+        total_api_keys += api_key_count
     
     # Delete all collections (cascade will handle fields and API key permissions)
     deleted_names = [c.name for c in collections]
@@ -244,7 +252,8 @@ async def bulk_delete_collections(
         "deleted_collections": deleted_names,
         "deleted_count": len(collections),
         "cascade_deleted": {
-            "fields": total_fields
+            "fields": total_fields,
+            "api_key_permissions": total_api_keys
         }
     }
 
