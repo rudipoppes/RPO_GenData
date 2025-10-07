@@ -49,11 +49,15 @@ async def create_api_key(
     # Add collection restrictions if specified
     if api_key_data.collection_ids:
         for collection_id in api_key_data.collection_ids:
-            # Verify user owns these collections
-            collection = db.query(Collection).filter(
-                Collection.id == collection_id,
-                Collection.owner_id == current_user.id
-            ).first()
+            # Verify collection exists (Admin can access all, others only owned)
+            from app.models.user import UserRole
+            if current_user.role == UserRole.ADMIN:
+                collection = db.query(Collection).filter(Collection.id == collection_id).first()
+            else:
+                collection = db.query(Collection).filter(
+                    Collection.id == collection_id,
+                    Collection.owner_id == current_user.id
+                ).first()
             if not collection:
                 db.rollback()
                 raise HTTPException(
