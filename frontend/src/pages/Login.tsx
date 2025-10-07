@@ -30,7 +30,7 @@ export default function Login() {
     setLoading(true);
 
     try {
-      await login({ username: email, password });
+      await login({ email, password });
       navigate('/', { replace: true });
     } catch (err: any) {
       console.error('Login error:', err);
@@ -104,9 +104,6 @@ export default function Login() {
         </form>
 
         <div className="text-center text-sm text-gray-500">
-          <p>Default credentials:</p>
-          <p>Email: admin@example.com</p>
-          <p>Password: admin123</p>
         </div>
       </div>
     </div>

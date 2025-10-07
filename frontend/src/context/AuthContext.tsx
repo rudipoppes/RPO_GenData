@@ -1,6 +1,12 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { apiService } from '../services/api';
-import type { User } from '../types/api';
+
+interface User {
+  id: number;
+  username: string;
+  email: string;
+  role: string;
+}
 
 interface AuthContextType {
   user: User | null;
@@ -11,48 +17,47 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export function AuthProvider({ children }: { children: ReactNode }) {
+interface AuthProviderProps {
+  children: ReactNode;
+}
+
+export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check if user is already logged in
-    const token = localStorage.getItem('token');
-    if (token) {
-      // Try to get user data
-      fetchUser();
-    } else {
-      setLoading(false);
-    }
+    checkAuthStatus();
   }, []);
 
-  const fetchUser = async () => {
+  const checkAuthStatus = async () => {
     try {
       const userData = await apiService.getCurrentUser();
       setUser(userData);
     } catch (error) {
-      console.error('Failed to fetch user:', error);
-      localStorage.removeItem('token');
+      console.log('Not authenticated');
     } finally {
       setLoading(false);
     }
   };
 
   const login = async (email: string, password: string) => {
-    await apiService.login({ username: email, password });
-    await fetchUser();
+    await apiService.login({ email, password });
+    await checkAuthStatus();
   };
 
   const logout = () => {
-    localStorage.removeItem('token');
+    apiService.logout();
     setUser(null);
   };
 
-  return (
-    <AuthContext.Provider value={{ user, loading, login, logout }}>
-      {children}
-    </AuthContext.Provider>
-  );
+  const value = {
+    user,
+    loading,
+    login,
+    logout,
+  };
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
 export function useAuth() {

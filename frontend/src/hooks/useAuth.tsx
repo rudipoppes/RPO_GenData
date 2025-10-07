@@ -40,7 +40,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const login = async (credentials: LoginRequest) => {
     try {
       await authApi.login(credentials);
-      // setUser will be called by fetchUserData
+      // After successful login, fetch user data
+      const currentUser = await authApi.getCurrentUser();
+      setUser(currentUser);
     } catch (error) {
       // Re-throw to let the login component handle the error
       throw error;
