@@ -28,7 +28,7 @@ export default function ApiKeys() {
     try {
       const newKey = await apiKeysApi.create(keyData);
       await loadApiKeys();
-      setShowCreateForm(false);
+      // Don't close form here - let the modal handle it after user acknowledges
       return newKey;
     } catch (err: any) {
       setError(err.response?.data?.detail || 'Failed to create API key');
@@ -238,6 +238,10 @@ function CreateApiKeyForm({
 
   const handleComplete = () => {
     if (acknowledged) {
+      // Reset form states
+      setCreatedKey(null);
+      setAcknowledged(false);
+      setCopied(false);
       onCancel();
     }
   };
