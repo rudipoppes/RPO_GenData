@@ -114,7 +114,7 @@ export default function ApiKeys() {
         />
       )}
 
-      {apiKeys.length === 0 ? (
+      {!showCreateForm && (apiKeys.length === 0 ? (
         <div className="text-center py-12">
           <div className="text-gray-500 mb-4">No API keys found</div>
           <button
@@ -178,7 +178,7 @@ export default function ApiKeys() {
             ))}
           </ul>
         </div>
-      )}
+      ))}
     </div>
   );
 }
