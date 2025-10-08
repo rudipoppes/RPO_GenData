@@ -13,6 +13,8 @@ export default function CollectionDetail() {
   const [error, setError] = useState('');
   const [showAddField, setShowAddField] = useState(false);
   const [editingField, setEditingField] = useState<Field | null>(null);
+  const [showSnippetModal, setShowSnippetModal] = useState(false);
+  const [snippetField, setSnippetField] = useState<Field | null>(null);
   
   // New field form state
   const [newField, setNewField] = useState<CreateFieldRequest>({
@@ -59,6 +61,39 @@ export default function CollectionDetail() {
     }
   };
 
+  const handleShowSnippet = (field: Field) => {
+    setSnippetField(field);
+    setShowSnippetModal(true);
+  };
+
+  const generateSnippetYAML = (field: Field) => {
+    const collectionName = encodeURIComponent(collection?.name || '');
+    const collectionType = field.collection_type;
+    const fieldName = field.field_name;
+
+    return `low_code:
+  id: ID-1
+  version: 2
+  steps:
+    - http:
+        method: GET
+        uri: /${collectionName}/${collectionType}
+        verify: false
+    - json
+    - jmespath:
+        value: "data.${fieldName}"`;
+  };
+
+  const copyToClipboard = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      alert('Snippet copied to clipboard!');
+    } catch (err) {
+      console.error('Failed to copy text: ', err);
+      alert('Failed to copy to clipboard');
+    }
+  };
+
   const handleAddField = async () => {
     try {
       if (editingField) {
@@ -87,7 +122,7 @@ export default function CollectionDetail() {
       }
       await loadCollection();
       setShowAddField(false);
-                    setEditingField(null);
+                  setEditingField(null);
       setEditingField(null);
       setNewField({
         collection_type: activeTab,
@@ -437,6 +472,12 @@ export default function CollectionDetail() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <button
+                          onClick={() => handleShowSnippet(field)}
+                          className="text-purple-600 hover:text-purple-900 mr-4"
+                        >
+                          Snippet
+                        </button>
+                        <button
                           onClick={() => {
                             setEditingField(field);
                             setNewField(field as any);
@@ -544,6 +585,58 @@ export default function CollectionDetail() {
                   className="bg-blue-600 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
                 >
                   {editingField ? "Update Field" : "Add Field"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Snippet Modal */}
+      {showSnippetModal && snippetField && (
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+          <div className="relative top-20 mx-auto p-5 border w-[600px] shadow-lg rounded-md bg-white">
+            <div className="mt-3">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-medium text-gray-900">Snippet Argument</h3>
+                <button
+                  onClick={() => {
+                    setShowSnippetModal(false);
+                    setSnippetField(null);
+                  }}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  <span className="sr-only">Close</span>
+                  <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              
+              <div className="mb-4">
+                <p className="text-sm text-gray-600 mb-3">
+                  Copy this snippet to use as SL1 Snippet Argument for field: <strong>{snippetField.field_name}</strong>
+                </p>
+                <pre className="bg-gray-50 p-4 rounded-md text-sm font-mono overflow-x-auto border">
+                  {generateSnippetYAML(snippetField)}
+                </pre>
+              </div>
+
+              <div className="flex justify-end space-x-3">
+                <button
+                  onClick={() => {
+                    setShowSnippetModal(false);
+                    setSnippetField(null);
+                  }}
+                  className="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50"
+                >
+                  Close
+                </button>
+                <button
+                  onClick={() => copyToClipboard(generateSnippetYAML(snippetField))}
+                  className="bg-blue-600 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white hover:bg-blue-700"
+                >
+                  Copy to Clipboard
                 </button>
               </div>
             </div>
