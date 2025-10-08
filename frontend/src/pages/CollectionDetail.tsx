@@ -86,11 +86,26 @@ export default function CollectionDetail() {
 
   const copyToClipboard = async (text: string) => {
     try {
-      await navigator.clipboard.writeText(text);
+      // Try modern clipboard API first
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(text);
+      } else {
+        // Fallback for older browsers or non-HTTPS contexts
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        textArea.style.position = "fixed";
+        textArea.style.left = "-999999px";
+        textArea.style.top = "-999999px";
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        document.execCommand("copy");
+        textArea.remove();
+      }
       alert('Snippet copied to clipboard!');
     } catch (err) {
-      console.error('Failed to copy text: ', err);
-      alert('Failed to copy to clipboard');
+      console.error("Failed to copy to clipboard:", err);
+      alert("Failed to copy to clipboard. Please select and copy the snippet manually.");
     }
   };
 
