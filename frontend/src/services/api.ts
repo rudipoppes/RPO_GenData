@@ -26,6 +26,29 @@ const api = axios.create({
 
 // Handle auth errors
 
+api.interceptors.response.use(
+  (response) => {
+    if (response.headers["x-token-refreshed"]) {
+      console.log("Token refreshed automatically");
+    }
+    return response;
+  },
+  async (error) => {
+    const originalRequest = error.config;
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+      try {
+        await api.post("/auth/refresh-token");
+        return api(originalRequest);
+      } catch (refreshError) {
+        window.location.href = "/login";
+        return Promise.reject(refreshError);
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+
 export const authApi = {
   login: (credentials: LoginRequest): Promise<LoginResponse> =>
     api.post('/auth/login', credentials).then(res => res.data),
@@ -34,6 +57,9 @@ export const authApi = {
     api.post('/auth/logout').then(res => res.data),
 
   getCurrentUser: (): Promise<User> =>
+    
+  refreshToken: (): Promise<{refreshed: boolean}> =>
+    api.post("/auth/refresh-token").then(res => res.data),
     api.get('/auth/me').then(res => res.data),
 };
 

@@ -17,25 +17,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [initialized, setInitialized] = useState(false);
 
-  // Token status monitoring
-  useEffect(() => {
-    if (!user) return;
-
-    const checkTokenStatus = async () => {
-      try {
-        // This will auto-refresh if needed via backend middleware
-        await authApi.getCurrentUser();
-      } catch (error) {
-        console.log("Token check failed, user will be logged out on next request");
-        // Don't immediately logout - let normal API flow handle it
-      }
-    };
-
-    // Check every 5 minutes
-    const interval = setInterval(checkTokenStatus, 5 * 60 * 1000);
-    return () => clearInterval(interval);
-  }, [user]);
-
   useEffect(() => {
     // Only run auth check once on mount
     if (!initialized) {

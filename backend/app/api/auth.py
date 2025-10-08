@@ -12,7 +12,7 @@ from app.schemas.auth import (
 )
 from app.auth.password import hash_password, verify_password
 from app.auth.jwt_auth import (
-    create_access_token, get_current_user, 
+    create_access_token, get_current_user, verify_token,
     get_current_admin_user, get_current_admin_or_editor_user
 )
 
@@ -59,6 +59,64 @@ async def login(
     db.commit()
     
     return LoginResponse(user=UserResponse.from_orm(user))
+
+@router.post("/refresh-token")
+async def refresh_token(
+    response: Response,
+    session_token: Optional[str] = Cookie(None),
+    db: Session = Depends(get_db)
+):
+    """Refresh token if within renewal window"""
+    if not session_token:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="No token provided"
+        )
+    
+    payload = verify_token(session_token)
+    if not payload:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid token"
+        )
+    
+    # Check if renewable
+    renewable_until = payload.get("renewable_until")
+    if not renewable_until or datetime.utcnow().timestamp() > renewable_until:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Session expired - please log in again"
+        )
+    
+    # Check if user still exists and is active
+    user_id = payload.get("sub")
+    if not user_id:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid token"
+        )
+    
+    user = db.query(User).filter(User.id == int(user_id)).first()
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User not found"
+        )
+    
+    # Create new token
+    new_token = create_access_token(data={"sub": str(user.id)})
+    
+    # Set new cookie
+    response.set_cookie(
+        key="session_token",
+        value=new_token,
+        httponly=True,
+        secure=False,
+        samesite="lax",
+        max_age=1800  # 30 minutes
+    )
+    
+    return {"refreshed": True, "user": UserResponse.from_orm(user)}
 
 @router.post("/logout", response_model=LogoutResponse)
 async def logout(response: Response):

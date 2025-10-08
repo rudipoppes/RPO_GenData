@@ -54,8 +54,7 @@ export const collectionsApi = {
     api.delete(`/admin/collections/${id}`).then(res => res.data),
 
   bulkDelete: (ids: number[]): Promise<void> =>
-    api.delete(`/admin/collections/bulk`, { data: { collection_ids: ids } }).then(res => res.data),
-    api.delete(`/admin/collections/bulk`, { data: { collection_ids: ids } }).then(res => res.data),
+    api({ method: 'DELETE', url: '/admin/collections/bulk', data: { collection_ids: ids } }).then(res => res.data),
 };
 
 export const fieldsApi = {
@@ -83,10 +82,13 @@ export const apiKeysApi = {
     api.put(`/admin/api-keys/${id}`, keyData).then(res => res.data),
 
   revoke: (id: number): Promise<void> =>
-    api.put(`/admin/api-keys/${id}/revoke`).then(res => res.data),
+    api.post(`/admin/api-keys/${id}/revoke`).then(res => res.data),
 
   delete: (id: number): Promise<void> =>
     api.delete(`/admin/api-keys/${id}`).then(res => res.data),
+
+  getAllowedCollections: (id: number): Promise<any[]> =>
+    api.get(`/admin/api-keys/${id}/allowed-collections`).then(res => res.data),
 };
 
 export default api;
