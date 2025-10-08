@@ -69,8 +69,8 @@ def test_data_generation_api_endpoint(authenticated_client, db):
     assert isinstance(generated_data["Epoch Time"], int)
     assert abs(generated_data["Epoch Time"] - time.time()) < 10  # Within 10 seconds
 
-def test_increment_decrement_generation(db):
-    """Test increment and decrement value generation."""
+def test_increment_generation_basic(db):
+    """Test basic increment value generation."""
     # Create test field with increment
     field = Field(
         collection_id=1,
@@ -82,7 +82,7 @@ def test_increment_decrement_generation(db):
         reset_number=30
     )
     
-    # Test increment behavior
+    # Test increment behavior - sequence should be: 10, 15, 20, 25, 30, then reset to 10
     value1 = ValueGenerator.generate_value(field, db)
     assert value1 == 10  # First call returns start value
     assert field.current_number == 15  # Next value is calculated
@@ -101,7 +101,93 @@ def test_increment_decrement_generation(db):
     
     value5 = ValueGenerator.generate_value(field, db)
     assert value5 == 30
-    assert field.current_number == 15  # Reset to start + step when exceeding threshold
+    assert field.current_number == 10  # FIXED: Reset to start value, not start + step
+
+def test_increment_generation_reset_boundary(db):
+    """Test increment reset at boundary - the bug we're fixing."""
+    # Test case matching the user's example: start=1, step=1, reset=10
+    field = Field(
+        collection_id=1,
+        collection_type=CollectionType.PERFORMANCE,
+        field_name="Simple Counter",
+        value_type=ValueType.INCREMENT,
+        start_number=1,
+        step_number=1,
+        reset_number=10
+    )
+    
+    # Generate sequence: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
+    values = []
+    for i in range(10):
+        value = ValueGenerator.generate_value(field, db)
+        values.append(value)
+    
+    # Should be [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    assert values == [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    
+    # After reaching 10, next value should be 1 (not 2!)
+    reset_value = ValueGenerator.generate_value(field, db)
+    assert reset_value == 1  # This was the bug - was returning 2
+
+def test_decrement_generation_basic(db):
+    """Test basic decrement value generation."""
+    # Create test field with decrement
+    field = Field(
+        collection_id=1,
+        collection_type=CollectionType.PERFORMANCE,
+        field_name="Countdown",
+        value_type=ValueType.DECREMENT,
+        start_number=20,
+        step_number=3,
+        reset_number=5
+    )
+    
+    # Test decrement behavior - sequence should be: 20, 17, 14, 11, 8, then reset to 20
+    value1 = ValueGenerator.generate_value(field, db)
+    assert value1 == 20  # First call returns start value
+    assert field.current_number == 17  # Next value is calculated
+    
+    value2 = ValueGenerator.generate_value(field, db)
+    assert value2 == 17
+    assert field.current_number == 14
+    
+    value3 = ValueGenerator.generate_value(field, db)
+    assert value3 == 14
+    assert field.current_number == 11
+    
+    value4 = ValueGenerator.generate_value(field, db)
+    assert value4 == 11
+    assert field.current_number == 8
+    
+    value5 = ValueGenerator.generate_value(field, db)
+    assert value5 == 8
+    assert field.current_number == 20  # FIXED: Reset to start value, not start - step
+
+def test_decrement_generation_reset_boundary(db):
+    """Test decrement reset at boundary."""
+    # Test case: start=10, step=2, reset=1
+    field = Field(
+        collection_id=1,
+        collection_type=CollectionType.PERFORMANCE,
+        field_name="Simple Countdown",
+        value_type=ValueType.DECREMENT,
+        start_number=10,
+        step_number=2,
+        reset_number=1
+    )
+    
+    # Generate sequence: 10, 8, 6, 4, 2
+    values = []
+    for i in range(5):
+        value = ValueGenerator.generate_value(field, db)
+        values.append(value)
+    
+    # Should be [10, 8, 6, 4, 2]
+    assert values == [10, 8, 6, 4, 2]
+    
+    # Next value would be 0, but that's < reset_number (1), so should reset to start_number (10)
+    reset_value = ValueGenerator.generate_value(field, db)
+    assert reset_value == 10  # Should reset to start value
 
 def test_value_validation():
     """Test field value validation."""

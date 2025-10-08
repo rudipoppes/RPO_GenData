@@ -52,7 +52,8 @@ class ValueGenerator:
             
             # Check if next value exceeds reset threshold
             if next_value > field.reset_number:
-                field.current_number = field.start_number + field.step_number
+                # Reset: next call should return start_number
+                field.current_number = field.start_number
             else:
                 field.current_number = next_value
         
@@ -73,7 +74,8 @@ class ValueGenerator:
             
             # Check if next value falls below reset threshold
             if next_value < field.reset_number:
-                field.current_number = field.start_number - field.step_number
+                # Reset: next call should return start_number
+                field.current_number = field.start_number
             else:
                 field.current_number = next_value
         
