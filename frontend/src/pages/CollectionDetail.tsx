@@ -632,24 +632,13 @@ export default function CollectionDetail() {
                 <p className="text-sm text-gray-600 mb-3">
                   Copy this snippet to use as SL1 Snippet Argument for field: <strong>{snippetField.field_name}</strong>
                 </p>
-                <pre className="bg-gray-50 p-4 rounded-md text-sm font-mono overflow-x-auto border">
-                  {generateSnippetYAML(snippetField)}
-                </pre>
+
               </div>
 
-              <div className="flex justify-end space-x-3">
-                <button
-                  onClick={() => {
-                    setShowSnippetModal(false);
-                    setSnippetField(null);
-                  }}
-                  className="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50"
-                >
-                  Close
-                </button>
+              <div className="mb-4">
                 <div className="flex items-center">
                   <div className="flex-1 bg-gray-50 p-3 rounded-l-md border border-gray-300">
-                    <code className="text-sm font-mono break-all">{generateSnippetYAML(snippetField)}</code>
+                    <pre className="text-sm font-mono break-all whitespace-pre">{generateSnippetYAML(snippetField)}</pre>
                   </div>
                   <button
                     onClick={() => copyToClipboard(generateSnippetYAML(snippetField))}
@@ -671,6 +660,18 @@ export default function CollectionDetail() {
                     )}
                   </button>
                 </div>
+              </div>
+
+              <div className="flex justify-end space-x-3">
+                <button
+                  onClick={() => {
+                    setShowSnippetModal(false);
+                    setSnippetField(null);
+                  }}
+                  className="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50"
+                >
+                  Close
+                </button>
               </div>
             </div>
           </div>
