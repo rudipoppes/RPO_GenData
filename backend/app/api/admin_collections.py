@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session, joinedload
 from sqlalchemy.exc import IntegrityError
 from typing import List
+from datetime import datetime
 from pydantic import BaseModel
 
 from app.db.database import get_db
@@ -12,7 +13,7 @@ from app.schemas.collection import (
     CollectionCreate, CollectionUpdate, CollectionResponse,
     FieldCreate, FieldUpdate, FieldResponse, CollectionWithFields
 )
-from app.auth.jwt_auth import get_current_user, get_current_admin_or_editor_user
+from app.auth.jwt_auth import get_current_user, get_current_admin_or_editor_user, get_current_admin_user
 from app.generators.value_generator import ValueGenerator
 
 router = APIRouter()
@@ -433,3 +434,108 @@ async def delete_field(
     return {"message": "Field deleted successfully"}
 
 from pydantic import BaseModel
+
+class CopyCollectionRequest(BaseModel):
+    count: int = Field(..., ge=1, le=10, description="Number of copies to create (1-10)")
+
+class CopyCollectionResponse(BaseModel):
+    copied_collections: List[CollectionResponse]
+    success_count: int
+    message: str
+
+@router.post("/collections/{collection_id}/copy", response_model=CopyCollectionResponse)
+async def copy_collection(
+    collection_id: int,
+    request: CopyCollectionRequest,
+    current_user: User = Depends(get_current_admin_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Copy a collection multiple times with all its fields.
+    New collections are owned by the current user.
+    """
+    
+    # Get the original collection
+    original_collection = db.query(Collection).filter(Collection.id == collection_id).first()
+    if not original_collection:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Collection not found"
+        )
+    
+    # Get all fields from the original collection  
+    original_fields = db.query(Field).filter(Field.collection_id == collection_id).all()
+    
+    copied_collections = []
+    
+    try:
+        for i in range(1, request.count + 1):
+            # Generate unique name
+            copy_name = f"{original_collection.name} (Copy {i})"
+            
+            # Check if name already exists and increment if needed
+            existing_count = 1
+            final_name = copy_name
+            while db.query(Collection).filter(Collection.name == final_name).first():
+                existing_count += 1
+                final_name = f"{original_collection.name} (Copy {existing_count})"
+            
+            # Create new collection
+            new_collection = Collection(
+                name=final_name,
+                description=original_collection.description,
+                owner_id=current_user.id,  # New owner is the copier
+                created_at=datetime.utcnow(),
+                updated_at=datetime.utcnow()
+            )
+            
+            db.add(new_collection)
+            db.flush()  # Get the new collection ID
+            
+            # Copy all fields
+            for original_field in original_fields:
+                new_field = Field(
+                    collection_id=new_collection.id,
+                    collection_type=original_field.collection_type,
+                    field_name=original_field.field_name,
+                    value_type=original_field.value_type,
+                    fixed_value_text=original_field.fixed_value_text,
+                    fixed_value_number=original_field.fixed_value_number,
+                    fixed_value_float=original_field.fixed_value_float,
+                    range_start_number=original_field.range_start_number,
+                    range_end_number=original_field.range_end_number,
+                    range_start_float=original_field.range_start_float,
+                    range_end_float=original_field.range_end_float,
+                    float_precision=original_field.float_precision,
+                    start_number=original_field.start_number,
+                    step_number=original_field.step_number,
+                    reset_number=original_field.reset_number,
+                    current_number=original_field.current_number,
+                    created_at=datetime.utcnow(),
+                    updated_at=datetime.utcnow()
+                )
+                db.add(new_field)
+            
+            copied_collections.append(CollectionResponse.from_orm(new_collection))
+        
+        # Commit all changes
+        db.commit()
+        
+        return CopyCollectionResponse(
+            copied_collections=copied_collections,
+            success_count=len(copied_collections),
+            message=f"Successfully created {len(copied_collections)} copies of '{original_collection.name}'"
+        )
+        
+    except IntegrityError as e:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Failed to create copies due to naming conflicts. Please try again."
+        )
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to copy collection: {str(e)}"
+        )

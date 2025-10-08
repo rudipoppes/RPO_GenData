@@ -82,6 +82,10 @@ export default function Collections() {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [cascadeInfo, setCascadeInfo] = useState({ fields: 0});
+  const [showCopyModal, setShowCopyModal] = useState(false);
+  const [copyingCollection, setCopyingCollection] = useState<Collection | null>(null);
+  const [copyCount, setCopyCount] = useState(1);
+  const [copying, setCopying] = useState(false);
 
   useEffect(() => {
     loadCollections();
@@ -98,6 +102,37 @@ export default function Collections() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleCopyClick = (collection: Collection) => {
+    setCopyingCollection(collection);
+    setCopyCount(1);
+    setShowCopyModal(true);
+  };
+
+  const handleCopyConfirm = async () => {
+    if (!copyingCollection) return;
+    
+    setCopying(true);
+    try {
+      const response = await collectionsApi.copy(copyingCollection.id, { count: copyCount });
+      await loadCollections();
+      setShowCopyModal(false);
+      setCopyingCollection(null);
+      alert(`Successfully created ${response.success_count} copies of "${copyingCollection.name}"`);
+    } catch (err: any) {
+      console.error('Copy failed:', err);
+      const errorMessage = err.response?.data?.detail || 'Failed to copy collection';
+      alert(errorMessage);
+    } finally {
+      setCopying(false);
+    }
+  };
+
+  const handleCopyCancel = () => {
+    setShowCopyModal(false);
+    setCopyingCollection(null);
+    setCopyCount(1);
   };
 
   // Search function across collections and fields
@@ -413,6 +448,15 @@ export default function Collections() {
                     >
                       View Details
                     </Link>
+                    <button
+                      onClick={() => handleCopyClick(collection)}
+                      className="text-purple-400 hover:text-purple-600 focus:outline-none focus:text-purple-600 mr-2"
+                      title="Copy collection"
+                    >
+                      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                      </svg>
+                    </button>
                     <Link
                       to={`/collections/${collection.id}/edit`}
                       className="text-gray-400 hover:text-gray-600 focus:outline-none focus:text-gray-600"
@@ -429,7 +473,68 @@ export default function Collections() {
         </div>
       </div>
 
-      <DeleteConfirmationDialog
+      {/* Copy Modal */}
+      {showCopyModal && copyingCollection && (
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+          <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+            <div className="mt-3">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-medium text-gray-900">Copy Collection</h3>
+                <button
+                  onClick={handleCopyCancel}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              
+              <div className="mb-4">
+                <p className="text-sm text-gray-600">
+                  Create copies of: <strong>{copyingCollection.name}</strong>
+                </p>
+                <p className="text-xs text-gray-500 mt-1">
+                  New collections will include all fields and be owned by you.
+                </p>
+              </div>
+
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Number of copies (1-10)
+                </label>
+                <input
+                  type="number"
+                  min="1"
+                  max="10"
+                  value={copyCount}
+                  onChange={(e) => setCopyCount(Math.min(10, Math.max(1, parseInt(e.target.value) || 1)))}
+                  className="block w-full border border-gray-300 rounded-md px-3 py-2"
+                />
+              </div>
+
+              <div className="flex justify-end space-x-3">
+                <button
+                  onClick={handleCopyCancel}
+                  disabled={copying}
+                  className="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleCopyConfirm}
+                  disabled={copying}
+                  className="bg-purple-600 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white hover:bg-purple-700 disabled:opacity-50"
+                >
+                  {copying ? 'Copying...' : `Create ${copyCount} ${copyCount === 1 ? 'Copy' : 'Copies'}`}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+            <DeleteConfirmationDialog
         isOpen={showDeleteDialog}
         collections={selectedCollectionObjects}
         onConfirm={handleDeleteConfirm}

@@ -55,6 +55,9 @@ export const collectionsApi = {
 
   bulkDelete: (ids: number[]): Promise<void> =>
     api({ method: 'DELETE', url: '/admin/collections/bulk', data: { collection_ids: ids } }).then(res => res.data),
+
+  copy: (id: number, request: { count: number }) =>
+    api.post(`/admin/collections/${id}/copy`, request).then(res => res.data),
 };
 
 export const fieldsApi = {
