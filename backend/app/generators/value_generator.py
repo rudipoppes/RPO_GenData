@@ -50,8 +50,8 @@ class ValueGenerator:
             current_value = field.current_number
             next_value = current_value + field.step_number
             
-            # Check if next value exceeds reset threshold
-            if next_value > field.reset_number:
+            # Check if reset_number is provided and next value exceeds reset threshold
+            if field.reset_number is not None and next_value > field.reset_number:
                 # Reset: next call should return start_number
                 field.current_number = field.start_number
             else:
@@ -72,8 +72,8 @@ class ValueGenerator:
             current_value = field.current_number
             next_value = current_value - field.step_number
             
-            # Check if next value falls below reset threshold
-            if next_value < field.reset_number:
+            # Check if reset_number is provided and next value falls below reset threshold
+            if field.reset_number is not None and next_value < field.reset_number:
                 # Reset: next call should return start_number
                 field.current_number = field.start_number
             else:
@@ -112,8 +112,8 @@ class ValueGenerator:
                 errors.append("range_start_float must be <= range_end_float")
         
         elif field.value_type in [ValueType.INCREMENT, ValueType.DECREMENT]:
-            if any(x is None for x in [field.start_number, field.step_number, field.reset_number]):
-                errors.append("start_number, step_number, and reset_number are required for INCREMENT/DECREMENT")
+            if field.start_number is None or field.step_number is None:
+                errors.append("start_number and step_number are required for INCREMENT/DECREMENT")
             elif field.step_number <= 0:
                 errors.append("step_number must be > 0")
         
