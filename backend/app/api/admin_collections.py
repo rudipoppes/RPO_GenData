@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session, joinedload
 from sqlalchemy.exc import IntegrityError
 from typing import List
 from datetime import datetime
+from pydantic import Field as PydanticField
 from pydantic import BaseModel
 
 from app.db.database import get_db
@@ -436,7 +437,7 @@ async def delete_field(
 from pydantic import BaseModel
 
 class CopyCollectionRequest(BaseModel):
-    count: int = Field(..., ge=1, le=10, description="Number of copies to create (1-10)")
+    count: int = PydanticField(..., ge=1, le=10, description="Number of copies to create (1-10)")
 
 class CopyCollectionResponse(BaseModel):
     copied_collections: List[CollectionResponse]
