@@ -484,7 +484,7 @@ async def copy_collection(
             # Create new collection
             new_collection = Collection(
                 name=final_name,
-                description=original_collection.description,
+                
                 owner_id=current_user.id,  # New owner is the copier
                 created_at=datetime.utcnow(),
                 updated_at=datetime.utcnow()
@@ -517,7 +517,14 @@ async def copy_collection(
                 )
                 db.add(new_field)
             
-            copied_collections.append(CollectionResponse.from_orm(new_collection))
+            copied_collections.append(CollectionResponse(
+                id=new_collection.id,
+                name=new_collection.name,
+                owner_id=new_collection.owner_id,
+                owner_username=current_user.username,
+                created_at=new_collection.created_at,
+                updated_at=new_collection.updated_at
+            ))
         
         # Commit all changes
         db.commit()
