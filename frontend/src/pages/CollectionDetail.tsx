@@ -15,7 +15,6 @@ export default function CollectionDetail() {
   const [editingField, setEditingField] = useState<Field | null>(null);
   const [showSnippetModal, setShowSnippetModal] = useState(false);
   const [snippetField, setSnippetField] = useState<Field | null>(null);
-  const [copied, setCopied] = useState(false);
   
   // New field form state
   const [newField, setNewField] = useState<CreateFieldRequest>({
@@ -73,7 +72,7 @@ export default function CollectionDetail() {
     const fieldName = field.field_name;
 
     return `low_code:
-  id: ID-1
+  
   version: 2
   steps:
     - http:
@@ -103,8 +102,7 @@ export default function CollectionDetail() {
         document.execCommand("copy");
         textArea.remove();
       }
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      alert('Snippet copied to clipboard!');
     } catch (err) {
       console.error("Failed to copy to clipboard:", err);
       alert("Failed to copy to clipboard. Please select and copy the snippet manually.");
@@ -634,10 +632,12 @@ export default function CollectionDetail() {
                 <p className="text-sm text-gray-600 mb-3">
                   Copy this snippet to use as SL1 Snippet Argument for field: <strong>{snippetField.field_name}</strong>
                 </p>
-                
+                <pre className="bg-gray-50 p-4 rounded-md text-sm font-mono overflow-x-auto border">
+                  {generateSnippetYAML(snippetField)}
+                </pre>
               </div>
 
-              <div className="flex justify-end space-x-3 mt-4">
+              <div className="flex justify-end space-x-3">
                 <button
                   onClick={() => {
                     setShowSnippetModal(false);
@@ -647,32 +647,12 @@ export default function CollectionDetail() {
                 >
                   Close
                 </button>
-                <div className="flex items-center">
-                  <div className="flex-1 bg-gray-50 p-3 rounded-l-md border border-gray-300">
-                    <pre className="text-sm font-mono overflow-x-auto whitespace-pre-wrap break-all">
-                      {generateSnippetYAML(snippetField)}
-                    </pre>
-                  </div>
-                  <button
-                    onClick={() => copyToClipboard(generateSnippetYAML(snippetField))}
-                    className={`px-4 py-3 border border-l-0 border-gray-300 rounded-r-md transition-colors ${
-                      copied 
-                        ? 'bg-green-100 text-green-800 border-green-300' 
-                        : 'bg-white text-gray-700 hover:bg-gray-50'
-                    }`}
-                    title="Copy to clipboard"
-                  >
-                    {copied ? (
-                      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
-                    ) : (
-                      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                      </svg>
-                    )}
-                  </button>
-                </div>
+                <button
+                  onClick={() => copyToClipboard(generateSnippetYAML(snippetField))}
+                  className="bg-blue-600 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white hover:bg-blue-700"
+                >
+                  Copy to Clipboard
+                </button>
               </div>
             </div>
           </div>
