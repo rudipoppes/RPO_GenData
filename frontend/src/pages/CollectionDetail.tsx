@@ -335,14 +335,14 @@ export default function CollectionDetail() {
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">Reset Value (Optional)</label>
+              <label className="block text-sm font-medium text-gray-700">Reset Threshold (Optional)</label>
               <input
                 type="number"
                 step="any"
                 className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
                 value={newField.reset_number || ''}
                 onChange={(e) => setNewField({...newField, reset_number: parseFloat(e.target.value)})}
-                placeholder="Reset to this value when reached"
+                placeholder="Reset to start when threshold reached"
               />
             </div>
           </div>
