@@ -15,6 +15,7 @@ import type {
   UserProfileUpdate,
   PasswordChangeRequest
 } from '../types/api';
+import { SessionExpiredError, isAuthenticationError } from './errors';
 
 const api = axios.create({
   baseURL: '/api',
@@ -24,7 +25,27 @@ const api = axios.create({
   withCredentials: true, // Important for cookie-based auth
 });
 
-// Handle auth errors
+// Global session expiry handler - will be set by AuthContext
+let globalSessionExpiredHandler: (() => void) | null = null;
+
+export const setSessionExpiredHandler = (handler: () => void) => {
+  globalSessionExpiredHandler = handler;
+};
+
+// Response interceptor for handling session expiry
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (isAuthenticationError(error)) {
+      // Trigger session expired modal if handler is available
+      if (globalSessionExpiredHandler) {
+        globalSessionExpiredHandler();
+      }
+      return Promise.reject(new SessionExpiredError('Your session has expired'));
+    }
+    return Promise.reject(error);
+  }
+);
 
 export const authApi = {
   login: (credentials: LoginRequest): Promise<LoginResponse> =>
