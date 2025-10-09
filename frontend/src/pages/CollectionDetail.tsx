@@ -216,7 +216,7 @@ export default function CollectionDetail() {
             <input
               type="number"
               className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
-              value={newField.fixed_value_number || ''}
+              value={newField.fixed_value_number ?? ''}
               onChange={(e) => setNewField({...newField, fixed_value_number: parseInt(e.target.value)})}
               placeholder="Enter number value"
             />
@@ -231,7 +231,7 @@ export default function CollectionDetail() {
               type="number"
               step="any"
               className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
-              value={newField.fixed_value_float || ''}
+              value={newField.fixed_value_float ?? ''}
               onChange={(e) => setNewField({...newField, fixed_value_float: parseFloat(e.target.value)})}
               placeholder="Enter float value"
             />
@@ -246,7 +246,7 @@ export default function CollectionDetail() {
               <input
                 type="number"
                 className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
-                value={newField.range_start_number || ''}
+                value={newField.range_start_number ?? ''}
                 onChange={(e) => setNewField({...newField, range_start_number: parseInt(e.target.value)})}
                 placeholder="Min value"
               />
@@ -256,7 +256,7 @@ export default function CollectionDetail() {
               <input
                 type="number"
                 className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
-                value={newField.range_end_number || ''}
+                value={newField.range_end_number ?? ''}
                 onChange={(e) => setNewField({...newField, range_end_number: parseInt(e.target.value)})}
                 placeholder="Max value"
               />
@@ -274,7 +274,7 @@ export default function CollectionDetail() {
                   type="number"
                   step="any"
                   className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
-                  value={newField.range_start_float || ''}
+                  value={newField.range_start_float ?? ''}
                   onChange={(e) => setNewField({...newField, range_start_float: parseFloat(e.target.value)})}
                   placeholder="Min value"
                 />
@@ -285,7 +285,7 @@ export default function CollectionDetail() {
                   type="number"
                   step="any"
                   className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
-                  value={newField.range_end_float || ''}
+                  value={newField.range_end_float ?? ''}
                   onChange={(e) => setNewField({...newField, range_end_float: parseFloat(e.target.value)})}
                   placeholder="Max value"
                 />
@@ -317,7 +317,7 @@ export default function CollectionDetail() {
                   type="number"
                   step="any"
                   className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
-                  value={newField.start_number || ''}
+                  value={newField.start_number ?? ''}
                   onChange={(e) => setNewField({...newField, start_number: parseFloat(e.target.value)})}
                   placeholder="Starting number"
                 />
@@ -328,7 +328,7 @@ export default function CollectionDetail() {
                   type="number"
                   step="any"
                   className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
-                  value={newField.step_number || ''}
+                  value={newField.step_number ?? ''}
                   onChange={(e) => setNewField({...newField, step_number: parseFloat(e.target.value)})}
                   placeholder="Increment/decrement by"
                 />
@@ -340,7 +340,7 @@ export default function CollectionDetail() {
                 type="number"
                 step="any"
                 className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
-                value={newField.reset_number || ''}
+                value={newField.reset_number ?? ''}
                 onChange={(e) => setNewField({...newField, reset_number: parseFloat(e.target.value)})}
                 placeholder="Reset to start when threshold reached"
               />
