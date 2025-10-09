@@ -52,7 +52,7 @@ async def login(
         httponly=True,
         secure=False,  # Set to True in production with HTTPS
         samesite="lax",
-        max_age=1800  # 30 minutes
+        max_age=10800  # 3 hours
     )
     
     # Update last login
@@ -114,7 +114,7 @@ async def refresh_token(
         httponly=True,
         secure=False,
         samesite="lax",
-        max_age=1800  # 30 minutes
+        max_age=10800  # 3 hours
     )
     
     return {"refreshed": True, "user": UserResponse.from_orm(user)}
