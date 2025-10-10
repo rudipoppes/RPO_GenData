@@ -2,7 +2,7 @@ export interface User {
   id: number;
   email: string;
   username: string;
-  role: 'Admin' | 'Editor' | 'Viewer';
+  role: 'Admin' | 'Editor';
   created_at: string;
   last_login_at?: string;
 }
@@ -125,19 +125,17 @@ export interface UserCreate {
   email: string;
   username: string;
   password: string;
-  role: 'Admin' | 'Editor' | 'Viewer';
+  role: 'Admin' | 'Editor';
 }
 
 export interface UserUpdate {
   email?: string;
-  username?: string;
-  role?: 'Admin' | 'Editor' | 'Viewer';
+  role?: 'Admin' | 'Editor';
   password?: string;
 }
 
 export interface UserProfileUpdate {
   email?: string;
-  username?: string;
 }
 
 export interface PasswordChangeRequest {

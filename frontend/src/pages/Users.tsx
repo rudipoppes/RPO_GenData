@@ -14,7 +14,7 @@ export default function Users() {
     email: '',
     username: '',
     password: '',
-    role: 'Viewer'
+    role: 'Editor'
   });
 
   // Redirect if not admin
@@ -49,7 +49,6 @@ export default function Users() {
         // Update user
         const updateData: UserUpdate = {
           email: formData.email !== editingUser.email ? formData.email : undefined,
-          username: formData.username !== editingUser.username ? formData.username : undefined,
           role: formData.role !== editingUser.role ? formData.role : undefined,
           password: formData.password || undefined
         };
@@ -101,7 +100,7 @@ export default function Users() {
       email: '',
       username: '',
       password: '',
-      role: 'Viewer'
+      role: 'Editor'
     });
     setEditingUser(null);
     setShowCreateForm(false);
@@ -111,7 +110,6 @@ export default function Users() {
     switch (role) {
       case 'Admin': return 'bg-red-100 text-red-800';
       case 'Editor': return 'bg-blue-100 text-blue-800';
-      case 'Viewer': return 'bg-gray-100 text-gray-800';
       default: return 'bg-gray-100 text-gray-800';
     }
   };
@@ -232,10 +230,12 @@ export default function Users() {
                   <input
                     type="text"
                     required
-                    className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    disabled={!!editingUser}
+                    className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
                     value={formData.username}
                     onChange={(e) => setFormData({ ...formData, username: e.target.value })}
                   />
+                  {editingUser && (<p className="text-xs text-gray-500 mt-1">Username cannot be changed after creation.</p>)}
                 </div>
 
                 <div>
@@ -261,8 +261,7 @@ export default function Users() {
                     value={formData.role}
                     onChange={(e) => setFormData({ ...formData, role: e.target.value as any })}
                   >
-                    <option value="Viewer">Viewer</option>
-                    <option value="Editor">Editor</option>
+                                        <option value="Editor">Editor</option>
                     <option value="Admin">Admin</option>
                   </select>
                 </div>

@@ -10,8 +10,7 @@ export default function Profile() {
   const [success, setSuccess] = useState('');
   
   const [profileData, setProfileData] = useState<UserProfileUpdate>({
-    email: '',
-    username: ''
+    email: ''
   });
   
   const [passwordData, setPasswordData] = useState<PasswordChangeRequest>({
@@ -24,8 +23,7 @@ export default function Profile() {
   useEffect(() => {
     if (currentUser) {
       setProfileData({
-        email: currentUser.email,
-        username: currentUser.username
+        email: currentUser.email
       });
     }
   }, [currentUser]);
@@ -78,7 +76,6 @@ export default function Profile() {
     switch (role) {
       case 'Admin': return 'bg-red-100 text-red-800';
       case 'Editor': return 'bg-blue-100 text-blue-800';
-      case 'Viewer': return 'bg-gray-100 text-gray-800';
       default: return 'bg-gray-100 text-gray-800';
     }
   };
@@ -163,11 +160,12 @@ export default function Profile() {
               </label>
               <input
                 type="text"
-                required
-                className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                value={profileData.username}
-                onChange={(e) => setProfileData({ ...profileData, username: e.target.value })}
+                readOnly
+                disabled
+                className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 bg-gray-100 text-gray-600"
+                value={currentUser.username}
               />
+              <p className="text-xs text-gray-500 mt-1">Username cannot be changed after creation.</p>
             </div>
 
             <button

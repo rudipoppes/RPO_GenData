@@ -9,17 +9,17 @@ class UserBase(BaseModel):
     role: UserRole
 
 class UserCreate(UserBase):
+    # Default minimum role is EDITOR
+    role: UserRole = UserRole.EDITOR
     password: str
 
 class UserUpdate(BaseModel):
     email: Optional[EmailStr] = None
-    username: Optional[str] = None
     role: Optional[UserRole] = None
     password: Optional[str] = None
 
 class UserProfileUpdate(BaseModel):
     email: Optional[EmailStr] = None
-    username: Optional[str] = None
 
 class UserResponse(UserBase):
     id: int

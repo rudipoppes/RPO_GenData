@@ -11,11 +11,10 @@ class UserCreate(BaseModel):
     email: EmailStr
     username: str
     password: str
-    role: UserRole = UserRole.VIEWER
+    role: UserRole = UserRole.EDITOR
 
 class UserUpdate(BaseModel):
     email: Optional[EmailStr] = None
-    username: Optional[str] = None
     role: Optional[UserRole] = None
 
 class UserResponse(BaseModel):
