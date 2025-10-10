@@ -7,6 +7,7 @@ export default function ApiKeys() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [showCreateForm, setShowCreateForm] = useState(false);
+  //   const [editingKey, setEditingKey] = useState<APIKey | null>(null);
   const [keyCollections, setKeyCollections] = useState<{[key: number]: any[]}>({});
 
   useEffect(() => {
@@ -165,6 +166,12 @@ export default function ApiKeys() {
                           Revoke
                         </button>
                       )}
+                      <button
+                        onClick={() => alert(`Edit API key: ${apiKey.label}`)}
+                        className="text-blue-600 hover:text-blue-500 text-sm"
+                      >
+                        Edit
+                      </button>
                       <button
                         onClick={() => handleDelete(apiKey.id)}
                         className="text-red-600 hover:text-red-500 text-sm"

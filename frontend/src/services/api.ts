@@ -113,6 +113,9 @@ export const apiKeysApi = {
 
   getAllowedCollections: (id: number): Promise<any[]> =>
     api.get(`/admin/api-keys/${id}/allowed-collections`).then(res => res.data),
+
+  edit: (id: number, keyData: Partial<CreateAPIKeyRequest>): Promise<APIKey> =>
+    api.put(`/admin/api-keys/${id}/edit`, keyData).then(res => res.data),
 };
 
 export default api;
