@@ -244,11 +244,28 @@ function CreateApiKeyForm({
   const copyToClipboard = async () => {
     if (createdKey) {
       try {
-        await navigator.clipboard.writeText(createdKey.key);
+        // Try modern clipboard API first
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(createdKey.key);
+        } else {
+          // Fallback for older browsers or non-HTTPS contexts
+          const textArea = document.createElement("textarea");
+          textArea.value = createdKey.key;
+          textArea.style.position = "fixed";
+          textArea.style.left = "-999999px";
+          textArea.style.top = "-999999px";
+          document.body.appendChild(textArea);
+          textArea.focus();
+          textArea.select();
+          document.execCommand("copy");
+          textArea.remove();
+        }
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
       } catch (err) {
-        console.error('Failed to copy to clipboard:', err);
+        console.error("Failed to copy to clipboard:", err);
+        // Show user-friendly error message
+        alert("Failed to copy to clipboard. Please select and copy the API key manually.");
       }
     }
   };

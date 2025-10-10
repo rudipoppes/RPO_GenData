@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react';
 import { apiKeysApi, collectionsApi } from '../services/api';
 import type { APIKey, CreateAPIKeyRequest, CreateAPIKeyResponse, Collection } from '../types/api';
+import { EditApiKeyForm } from '../components/EditApiKeyForm';
 
 export default function ApiKeys() {
   const [apiKeys, setApiKeys] = useState<APIKey[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [showCreateForm, setShowCreateForm] = useState(false);
-  //   const [editingKey, setEditingKey] = useState<APIKey | null>(null);
+    const [editingKey, setEditingKey] = useState<APIKey | null>(null);
   const [keyCollections, setKeyCollections] = useState<{[key: number]: any[]}>({});
 
   useEffect(() => {
@@ -79,7 +80,20 @@ export default function ApiKeys() {
 
 
   const handleEdit = (apiKey: APIKey) => {
-    alert(`Would edit API key: ${apiKey.label}. This feature is ready - just needs the form implementation.`);
+    setEditingKey(apiKey);
+  };
+
+  const handleEditSubmit = async (keyData: CreateAPIKeyRequest): Promise<APIKey | null> => {
+    if (!editingKey) return null;
+    try {
+      const updatedKey = await apiKeysApi.edit(editingKey.id, keyData);
+      await loadApiKeys();
+      setEditingKey(null);
+      return updatedKey;
+    } catch (err: any) {
+      setError(err.response?.data?.detail || "Failed to update API key");
+      return null;
+    }
   };
   if (loading) {
     return (
@@ -116,6 +130,14 @@ export default function ApiKeys() {
         <CreateApiKeyForm
           onSubmit={handleCreate}
           onCancel={() => setShowCreateForm(false)}
+        />
+      )}
+
+      {editingKey && (
+        <EditApiKeyForm
+          apiKey={editingKey}
+          onSubmit={handleEditSubmit}
+          onCancel={() => setEditingKey(null)}
         />
       )}
 

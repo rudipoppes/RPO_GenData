@@ -11,58 +11,20 @@ Default admin credentials:
 
 INFO:     Will watch for changes in these directories: ['/home/ubuntu/RPO_GenData/backend']
 INFO:     Uvicorn running on http://0.0.0.0:8088 (Press CTRL+C to quit)
-INFO:     Started reloader process [522626] using WatchFiles
+INFO:     Started reloader process [771716] using WatchFiles
 Initializing database...
-Database already has 2 users
+Database already has 3 users
 Starting RPO GenData server on 0.0.0.0:8088
-INFO:     Started server process [522718]
+INFO:     Started server process [771718]
 INFO:     Waiting for application startup.
 INFO:     Application startup complete.
-INFO:     127.0.0.1:38968 - "GET /api/health HTTP/1.1" 200 OK
-INFO:     104.28.90.33:56021 - "GET /collections/1 HTTP/1.1" 200 OK
-INFO:     104.28.90.33:56021 - "GET /index-5f1c3be7.css HTTP/1.1" 200 OK
-INFO:     104.28.90.33:56103 - "GET /index-e352dda2.js HTTP/1.1" 200 OK
-INFO:     104.28.90.33:56021 - "GET /api/auth/me HTTP/1.1" 200 OK
-INFO:     104.28.90.33:56103 - "GET /api/admin/collections/1 HTTP/1.1" 200 OK
-INFO:     104.28.90.33:55942 - "GET /api/admin/collections HTTP/1.1" 200 OK
-INFO:     104.28.90.33:55942 - "GET /api/admin/collections HTTP/1.1" 200 OK
-INFO:     104.28.90.35:33386 - "GET /api/admin/api-keys HTTP/1.1" 200 OK
-INFO:     104.28.90.33:55942 - "GET /api/admin/collections HTTP/1.1" 200 OK
-INFO:     104.28.90.34:33523 - "GET /api/admin/collections/1 HTTP/1.1" 200 OK
-INFO:     104.28.90.34:33523 - "GET /api/admin/collections HTTP/1.1" 200 OK
-INFO:     104.28.90.34:33523 - "GET /api/admin/users HTTP/1.1" 200 OK
-WARNING:  WatchFiles detected changes in 'app/api/admin_collections.py'. Reloading...
-INFO:     Shutting down
-INFO:     Waiting for application shutdown.
-INFO:     Application shutdown complete.
-INFO:     Finished server process [522718]
-INFO:     Started server process [526952]
-INFO:     Waiting for application startup.
-INFO:     Application startup complete.
-INFO:     64.23.133.185:56602 - "GET / HTTP/1.1" 200 OK
-INFO:     64.23.133.185:56612 - "GET /vite.svg HTTP/1.1" 200 OK
-WARNING:  Invalid HTTP request received.
-INFO:     198.235.24.53:55707 - "GET / HTTP/1.0" 200 OK
-INFO:     146.75.209.12:7612 - "GET /api/admin/collections HTTP/1.1" 401 Unauthorized
-INFO:     146.75.209.12:7612 - "GET /collections HTTP/1.1" 200 OK
-INFO:     146.75.209.12:7612 - "GET /index-5f1c3be7.css HTTP/1.1" 304 Not Modified
-INFO:     146.75.209.12:7488 - "GET /index-e352dda2.js HTTP/1.1" 304 Not Modified
-INFO:     146.75.209.12:7612 - "GET /api/auth/me HTTP/1.1" 401 Unauthorized
-INFO:     146.75.209.12:7542 - "POST /api/auth/login HTTP/1.1" 200 OK
-INFO:     146.75.209.12:7542 - "GET /api/auth/me HTTP/1.1" 200 OK
-INFO:     146.75.209.12:7542 - "GET /api/admin/collections HTTP/1.1" 200 OK
-INFO:     146.75.209.12:7632 - "GET /api/admin/api-keys HTTP/1.1" 200 OK
-INFO:     146.75.209.12:7464 - "GET /api/admin/collections/1 HTTP/1.1" 200 OK
-INFO:     146.75.209.12:7464 - "PATCH /api/admin/fields/3 HTTP/1.1" 200 OK
-INFO:     146.75.209.12:7464 - "GET /api/admin/collections/1 HTTP/1.1" 200 OK
-INFO:     146.75.209.12:7499 - "GET /collections/1 HTTP/1.1" 200 OK
-INFO:     146.75.209.12:7499 - "GET /index-8c43a14b.js HTTP/1.1" 200 OK
-INFO:     146.75.209.12:7604 - "GET /index-21410e86.css HTTP/1.1" 200 OK
-INFO:     146.75.209.12:7499 - "GET /api/auth/me HTTP/1.1" 200 OK
-INFO:     146.75.209.12:7604 - "GET /api/admin/collections/1 HTTP/1.1" 200 OK
-INFO:     146.75.209.12:7499 - "GET /api/admin/collections HTTP/1.1" 200 OK
-INFO:     Shutting down
-INFO:     Waiting for application shutdown.
-INFO:     Application shutdown complete.
-INFO:     Finished server process [526952]
-INFO:     Stopping reloader process [522626]
+INFO:     127.0.0.1:47236 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     54.252.220.119:38294 - "GET /api/data/BHP-TRUCK01/Performance HTTP/1.1" 403 Forbidden
+INFO:     54.252.220.119:38310 - "GET /api/data/RPO_TYPE_TESTING/Performance HTTP/1.1" 200 OK
+INFO:     54.252.220.119:38004 - "GET /api/data/BHP-TRUCK01/Performance HTTP/1.1" 403 Forbidden
+INFO:     54.252.220.119:38012 - "GET /api/data/RPO_TYPE_TESTING/Performance HTTP/1.1" 200 OK
+INFO:     54.252.220.119:42464 - "GET /api/data/BHP-TRUCK01/Performance HTTP/1.1" 403 Forbidden
+INFO:     54.252.220.119:42472 - "GET /api/data/RPO_TYPE_TESTING/Performance HTTP/1.1" 200 OK
+INFO:     54.252.220.119:43498 - "GET /api/data/BHP-TRUCK01/Performance HTTP/1.1" 403 Forbidden
+INFO:     54.252.220.119:43514 - "GET /api/data/RPO_TYPE_TESTING/Performance HTTP/1.1" 200 OK
+INFO:     127.0.0.1:41752 - "GET /api/health HTTP/1.1" 200 OK
