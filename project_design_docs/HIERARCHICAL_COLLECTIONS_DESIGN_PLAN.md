@@ -1,6 +1,21 @@
 # HIERARCHICAL COLLECTIONS - COMPLETE DESIGN & DEVELOPMENT PLAN
 
 **Creation Date**: October 10, 2025  
+**Progress Update (2025-10-10)**:
+- Phase 1: COMPLETE (tag: `phase1-complete`)  
+  - Removed VIEWER role; minimum role is EDITOR
+  - Username immutable in backend and frontend
+  - Base schema prepared and applied for folder support (SQLite)  
+  - Frontend updated to remove Viewer and username editing
+  - Branch: `feature/hierarchical-collections-phase1` (baseline tag: `baseline-3db4f59`)
+- Phase 2: IN PROGRESS (backend scaffolding)
+  - Collection model extended: `folder_path`, `parent_folder_id`, `is_folder`; self-referential relationships and helpers
+  - Folder endpoints added: POST/GET/PUT/DELETE under `/api/admin/folders`
+  - Router registered in app
+  - Auto-create user root folder `/users/{username}/` on user creation
+  - Backfilled existing users' root folders in DB  
+  - Next: integrate collections with parent_folder_id, move endpoints, folder-based API key groundwork, tests
+  
 **Pre-Implementation Git Commit**: `3db4f59` - Update project status documentation  
 **Database Backup**: `gendata_backup_3db4f59.db` (Complete restore point)  
 **Current Database State**: `current_database_state_3db4f59.txt`  
