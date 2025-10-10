@@ -114,3 +114,9 @@ async def delete_folder(
     db.delete(folder)
     db.commit()
     return {"message": "Folder deleted"}
+
+
+@router.post("/folders/{folder_id}/move", response_model=FolderResponse)
+async def move_folder_alias(folder_id: int, data: FolderUpdate, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    # Alias to update only parent
+    return await update_folder(folder_id, data, current_user, db)
