@@ -105,7 +105,7 @@ export default function ApiKeys() {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-8">
+      <div className="flex justify-between items-center mb-8" style={{display: editingKey ? "none" : "block"}}>
         <div>
           <h1 className="text-3xl font-bold text-gray-900">API Keys</h1>
           <p className="mt-2 text-gray-600">
@@ -141,7 +141,7 @@ export default function ApiKeys() {
         />
       )}
 
-      {!showCreateForm && (apiKeys.length === 0 ? (
+      {!showCreateForm && !editingKey && (apiKeys.length === 0 ? (
         <div className="text-center py-12">
           <div className="text-gray-500 mb-4">No API keys found</div>
           <button
