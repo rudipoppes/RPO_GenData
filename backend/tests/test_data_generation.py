@@ -7,7 +7,7 @@ from app.generators.value_generator import ValueGenerator
 def test_data_generation_api_endpoint(authenticated_client, db):
     """Test the public data generation API endpoint."""
     # Create collection
-    collection_response = authenticated_client.post("/admin/collections", json={
+    collection_response = authenticated_client.post("/api/admin/collections", json={
         "name": "Test Data Collection"
     })
     collection_id = collection_response.json()["id"]
@@ -41,11 +41,11 @@ def test_data_generation_api_endpoint(authenticated_client, db):
     ]
     
     for field_data in fields_data:
-        response = authenticated_client.post(f"/admin/collections/{collection_id}/fields", json=field_data)
+        response = authenticated_client.post(f"/api/admin/collections/{collection_id}/fields", json=field_data)
         assert response.status_code == 200
     
     # Create API key
-    api_key_response = authenticated_client.post("/admin/api-keys", json={
+    api_key_response = authenticated_client.post("/api/admin/api-keys", json={
         "label": "Test API Key"
     })
     assert api_key_response.status_code == 200
@@ -53,7 +53,7 @@ def test_data_generation_api_endpoint(authenticated_client, db):
     
     # Test data generation via public API
     headers = {"X-API-Key": api_key}
-    response = authenticated_client.get("/api/Test%20Data%20Collection/Performance", headers=headers)
+    response = authenticated_client.get("/api/data/Test%20Data%20Collection/Performance", headers=headers)
     assert response.status_code == 200
     
     data = response.json()
@@ -161,7 +161,11 @@ def test_decrement_generation_basic(db):
     
     value5 = ValueGenerator.generate_value(field, db)
     assert value5 == 8
-    assert field.current_number == 20  # FIXED: Reset to start value, not start - step
+    # inclusive-threshold behavior: if reachable, threshold is seen next
+    assert field.current_number == 5
+    value6 = ValueGenerator.generate_value(field, db)
+    assert value6 == 5
+    assert field.current_number == 20
 
 def test_decrement_generation_reset_boundary(db):
     """Test decrement reset at boundary."""
