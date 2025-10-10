@@ -11,6 +11,7 @@ from app.api.admin_collections import router as admin_collections_router
 from app.api.admin_api_keys import router as admin_api_keys_router
 from app.api.admin import router as admin_router
 from app.api.admin_users import router as admin_users_router
+from app.api.admin_folders import router as admin_folders_router
 
 # Create FastAPI app
 app = FastAPI(
@@ -38,6 +39,7 @@ app.include_router(admin_collections_router, prefix=f"{settings.api_prefix}/admi
 app.include_router(admin_api_keys_router, prefix=f"{settings.api_prefix}/admin", tags=["admin-api-keys"])
 app.include_router(admin_router, prefix=f"{settings.api_prefix}/admin", tags=["admin"])
 app.include_router(admin_users_router, prefix=f"{settings.api_prefix}/admin", tags=["admin-users"])
+app.include_router(admin_folders_router, prefix=f"{settings.api_prefix}/admin", tags=["admin-folders"])
 
 # Health check for API
 @app.get(f"{settings.api_prefix}/health")

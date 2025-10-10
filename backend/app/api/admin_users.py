@@ -5,6 +5,8 @@ from passlib.context import CryptContext
 
 from app.db.database import get_db
 from app.models.user import User, UserRole
+from app.models.collection import Collection
+from sqlalchemy.exc import IntegrityError
 from app.schemas.user import (
     UserCreate, UserUpdate, UserResponse,
     PasswordChangeRequest, UserProfileUpdate
@@ -58,6 +60,22 @@ async def create_user(
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
+
+    # Create user root folder: /users/{username}/
+    try:
+        root = Collection(
+            name=db_user.username,
+            owner_id=db_user.id,
+            is_folder=True,
+            parent_folder_id=None,
+            folder_path=f"/users/{db_user.username}/",
+        )
+        db.add(root)
+        db.commit()
+    except IntegrityError:
+        db.rollback()
+    except Exception:
+        db.rollback()
 
     return UserResponse.from_orm(db_user)
 
