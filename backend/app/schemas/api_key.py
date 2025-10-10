@@ -36,3 +36,8 @@ class APIKeyAllowedCollection(BaseModel):
     collection_id: int
     collection_name: str
     collection_type: Optional[str] = None
+
+class APIKeyEditRequest(BaseModel):
+    label: Optional[str] = None
+    expires_at: Optional[datetime] = None
+    collection_ids: Optional[List[int]] = None  # None = all collections
