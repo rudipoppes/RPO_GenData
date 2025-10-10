@@ -41,8 +41,9 @@ class APIKeyAllowed(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     api_key_id = Column(Integer, ForeignKey("api_keys.id"), nullable=False)
-    collection_id = Column(Integer, ForeignKey("collections.id"), nullable=False)
+    collection_id = Column(Integer, ForeignKey("collections.id"), nullable=True)
     collection_type = Column(String, nullable=True)  # Optional: restrict to Performance or Configuration
+    folder_path = Column(String, nullable=True)  # Folder-based scope
 
     # Relationships
     api_key = relationship("APIKey", back_populates="allowed_collections")

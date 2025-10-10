@@ -5,9 +5,11 @@ from app.models.field import CollectionType, ValueType
 
 class CollectionCreate(BaseModel):
     name: str
+    parent_folder_id: Optional[int] = None
 
 class CollectionUpdate(BaseModel):
     name: Optional[str] = None
+    parent_folder_id: Optional[int] = None
 
 class CollectionResponse(BaseModel):
     id: int

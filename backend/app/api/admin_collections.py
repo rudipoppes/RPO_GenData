@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session, joinedload
 from sqlalchemy.exc import IntegrityError
-from typing import List
+from typing import List, Optional
 from datetime import datetime
 from pydantic import Field as PydanticField
 from pydantic import BaseModel
@@ -35,9 +35,28 @@ async def create_collection(
             detail="Collection with this name already exists"
         )
     
+    parent_id = collection_data.parent_folder_id
+    if parent_id is None:
+        root = db.query(Collection).filter(Collection.is_folder == True, Collection.owner_id == current_user.id, Collection.parent_folder_id == None).first()
+        parent_id = root.id if root else None
+    else:
+        parent = db.query(Collection).filter(Collection.id == parent_id, Collection.is_folder == True).first()
+        if not parent:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Parent folder not found")
+        from app.models.user import UserRole
+        if current_user.role != UserRole.ADMIN and parent.owner_id != current_user.id:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized for parent folder")
+        depth = 1
+        node = parent
+        while node and node.parent_folder_id is not None and depth < 10:
+            depth += 1
+            node = db.query(Collection).filter(Collection.id == node.parent_folder_id, Collection.is_folder == True).first()
+        if depth >= 5:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Max folder depth (5) exceeded")
     db_collection = Collection(
         name=collection_data.name,
-        owner_id=current_user.id
+        owner_id=current_user.id,
+        parent_folder_id=parent_id
     )
     
     db.add(db_collection)
@@ -60,17 +79,23 @@ async def create_collection(
 @router.get("/collections", response_model=List[CollectionWithFields])
 async def list_collections(
     current_user: User = Depends(get_current_user),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    parent_folder_id: Optional[int] = None
 ):
     """List collections accessible to the current user."""
     from app.models.user import UserRole
     
     if current_user.role == UserRole.ADMIN:
-        # Admin can see all collections
-        collections = db.query(Collection).options(joinedload(Collection.fields), joinedload(Collection.owner)).all()
+        q = db.query(Collection).options(joinedload(Collection.fields), joinedload(Collection.owner)).filter(Collection.is_folder == False)
+        if parent_folder_id is not None:
+            q = q.filter(Collection.parent_folder_id == parent_folder_id)
+        collections = q.all()
     else:
-        # Editors and Viewers can only see their own collections
-        collections = db.query(Collection).options(joinedload(Collection.fields), joinedload(Collection.owner)).filter(Collection.owner_id == current_user.id).all()
+        # Editors can only see their own collections
+        q = db.query(Collection).options(joinedload(Collection.fields), joinedload(Collection.owner)).filter(Collection.owner_id == current_user.id, Collection.is_folder == False)
+        if parent_folder_id is not None:
+            q = q.filter(Collection.parent_folder_id == parent_folder_id)
+        collections = q.all()
     
     result = []
     for c in collections:
@@ -178,7 +203,7 @@ async def update_collection(
         updated_at=collection.updated_at
     )
 
-from typing import List
+from typing import List, Optional
 
 class BulkDeleteCollectionsRequest(BaseModel):
     collection_ids: List[int]
@@ -547,3 +572,39 @@ async def copy_collection(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to copy collection: {str(e)}"
         )
+
+
+from pydantic import BaseModel as _BM
+class MoveCollectionRequest(_BM):
+    parent_folder_id: Optional[int] = None
+
+@router.post("/collections/{collection_id}/move", response_model=CollectionResponse)
+async def move_collection(collection_id: int, req: MoveCollectionRequest, current_user: User = Depends(get_current_admin_or_editor_user), db: Session = Depends(get_db)):
+    from app.models.user import UserRole
+    col = db.query(Collection).filter(Collection.id == collection_id, Collection.is_folder == False).first()
+    if not col:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Collection not found")
+    if current_user.role != UserRole.ADMIN and col.owner_id != current_user.id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized")
+    new_parent_id = req.parent_folder_id
+    if new_parent_id is not None:
+        parent = db.query(Collection).filter(Collection.id == new_parent_id, Collection.is_folder == True).first()
+        if not parent:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Destination folder not found")
+        if current_user.role != UserRole.ADMIN and parent.owner_id != current_user.id:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized for destination")
+        # depth check
+        depth = 1
+        node = parent
+        while node and node.parent_folder_id is not None and depth < 10:
+            depth += 1
+            node = db.query(Collection).filter(Collection.id == node.parent_folder_id, Collection.is_folder == True).first()
+        if depth >= 5:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Max folder depth (5) exceeded")
+        col.parent_folder_id = new_parent_id
+    else:
+        # move to root
+        col.parent_folder_id = None
+    db.commit()
+    owner = db.query(User).filter(User.id == col.owner_id).first()
+    return CollectionResponse(id=col.id, name=col.name, owner_id=col.owner_id, owner_username=owner.username, created_at=col.created_at, updated_at=col.updated_at)
