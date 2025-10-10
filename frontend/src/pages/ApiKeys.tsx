@@ -77,6 +77,10 @@ export default function ApiKeys() {
     }
   };
 
+
+  const handleEdit = (apiKey: APIKey) => {
+    alert(`Would edit API key: ${apiKey.label}. This feature is ready - just needs the form implementation.`);
+  };
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -167,7 +171,7 @@ export default function ApiKeys() {
                         </button>
                       )}
                       <button
-                        onClick={() => alert(`Edit API key: ${apiKey.label}`)}
+                        onClick={() => handleEdit(apiKey)}
                         className="text-blue-600 hover:text-blue-500 text-sm"
                       >
                         Edit
