@@ -18,6 +18,7 @@ export default function Layout({ children }: LayoutProps) {
 
   const navigation = [
     { name: 'Collections', href: '/collections' },
+    { name: 'Spike Schedules', href: '/spike-schedules' },
     { name: 'API Keys', href: '/api-keys' },
     { name: 'Samples', href: '/samples' },
   ];

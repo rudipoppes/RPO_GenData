@@ -16,3 +16,4 @@ class Collection(Base):
     owner = relationship("User", back_populates="collections")
     fields = relationship("Field", back_populates="collection", cascade="all, delete-orphan")
     api_key_allowed = relationship("APIKeyAllowed", back_populates="collection", cascade="all, delete-orphan")
+    spike_schedules = relationship("SpikeSchedule", back_populates="collection", cascade="all, delete-orphan")
