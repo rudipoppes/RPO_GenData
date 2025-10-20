@@ -77,7 +77,7 @@ export default function CollectionDetail() {
   steps:
     - http:
         method: GET
-        uri: /${collectionName}/${collectionType}
+        uri: /\${silo_comp_name}/${collectionType}
         verify: false
     - json
     - jmespath:
