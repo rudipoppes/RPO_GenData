@@ -68,7 +68,6 @@ export default function CollectionDetail() {
   };
 
   const generateSnippetYAML = (field: Field) => {
-    const collectionName = encodeURIComponent(collection?.name || '');
     const collectionType = field.collection_type;
     const fieldName = field.field_name;
 
