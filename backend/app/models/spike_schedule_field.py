@@ -2,7 +2,7 @@ from sqlalchemy import Column, Integer, String, Float, ForeignKey, Enum, DateTim
 from sqlalchemy.orm import relationship
 from app.db.database import Base
 from app.models.field import CollectionType, ValueType
-from datetime import datetime
+from datetime import datetime, timezone
 
 class SpikeScheduleField(Base):
     __tablename__ = "spike_schedule_fields"
@@ -30,8 +30,8 @@ class SpikeScheduleField(Base):
     reset_number = Column(Float, nullable=True)
     current_number = Column(Float, nullable=True)  # Independent state for INCREMENT/DECREMENT
     
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
+    updated_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
     
     # Relationships
     spike_schedule = relationship("SpikeSchedule", back_populates="spike_fields")

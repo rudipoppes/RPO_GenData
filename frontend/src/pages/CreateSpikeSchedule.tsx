@@ -30,6 +30,22 @@ export default function CreateSpikeSchedule() {
     'NUMBER_FIXED', 'FLOAT_FIXED', 'NUMBER_RANGE', 'FLOAT_RANGE', 'INCREMENT', 'DECREMENT'
   ];
 
+  // Helper function to convert local datetime input to UTC ISO string
+  const convertLocalDateTimeToUTC = (localDateTime: string): string => {
+    if (!localDateTime) return '';
+    // Create a Date object from the local datetime string (browser timezone)
+    const localDate = new Date(localDateTime);
+    // Convert to UTC ISO string for API
+    return localDate.toISOString();
+  };
+
+  // Helper function to convert UTC datetime to local datetime input format
+  const convertUTCToLocalDateTime = (utcDate: Date): string => {
+    // Convert UTC date to local timezone and format for datetime-local input
+    const localDate = new Date(utcDate.getTime() - utcDate.getTimezoneOffset() * 60000);
+    return localDate.toISOString().slice(0, 16);
+  };
+
   useEffect(() => {
     loadCollections();
     if (isEdit && id) {
@@ -55,8 +71,8 @@ export default function CreateSpikeSchedule() {
       const schedule = await spikeSchedulesApi.get(scheduleId);
       setFormData({
         name: schedule.name,
-        start_datetime: new Date(schedule.start_datetime).toISOString().slice(0, 16),
-        end_datetime: new Date(schedule.end_datetime).toISOString().slice(0, 16)
+        start_datetime: convertUTCToLocalDateTime(new Date(schedule.start_datetime)),
+        end_datetime: convertUTCToLocalDateTime(new Date(schedule.end_datetime))
       });
       
       // Find the collection
@@ -164,8 +180,8 @@ export default function CreateSpikeSchedule() {
       if (isEdit) {
         const updateData: UpdateSpikeScheduleRequest = {
           name: formData.name,
-          start_datetime: formData.start_datetime,
-          end_datetime: formData.end_datetime,
+          start_datetime: convertLocalDateTimeToUTC(formData.start_datetime),
+          end_datetime: convertLocalDateTimeToUTC(formData.end_datetime),
           spike_fields: spikeFields
         };
         await spikeSchedulesApi.update(parseInt(id!), updateData);
@@ -173,8 +189,8 @@ export default function CreateSpikeSchedule() {
         const createData: CreateSpikeScheduleRequest = {
           collection_id: selectedCollection.id,
           name: formData.name,
-          start_datetime: formData.start_datetime,
-          end_datetime: formData.end_datetime,
+          start_datetime: convertLocalDateTimeToUTC(formData.start_datetime),
+          end_datetime: convertLocalDateTimeToUTC(formData.end_datetime),
           spike_fields: spikeFields
         };
         await spikeSchedulesApi.create(createData);

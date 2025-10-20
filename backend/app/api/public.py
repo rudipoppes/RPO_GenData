@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status, Path
 from sqlalchemy.orm import Session
 from typing import Dict, Any
 import time
-from datetime import datetime
+from datetime import datetime, timezone
 from urllib.parse import unquote
 
 from app.db.database import get_db
@@ -63,7 +63,7 @@ async def get_generated_data(
         )
     
     # Check for active spike schedule
-    now = datetime.utcnow()
+    now = datetime.now(timezone.utc)
     active_spike = db.query(SpikeSchedule).filter(
         SpikeSchedule.collection_id == collection.id,
         SpikeSchedule.start_datetime <= now,

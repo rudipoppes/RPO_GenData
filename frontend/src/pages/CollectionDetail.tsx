@@ -27,6 +27,13 @@ export default function CollectionDetail() {
 
   const collectionId = parseInt(id || '0');
 
+  // Helper function to convert UTC datetime string to local timezone string for display
+  const convertUTCToLocalString = (utcDateStr: string): string => {
+    // Convert string to Date object and return local timezone representation
+    const utcDate = new Date(utcDateStr);
+    return utcDate.toLocaleString();
+  };
+
   useEffect(() => {
     if (collectionId) {
       loadCollection();
@@ -512,7 +519,7 @@ export default function CollectionDetail() {
                           </div>
                           <div className="mt-1">
                             <p className="text-sm text-gray-500">
-                              {new Date(schedule.start_datetime).toLocaleString()} - {new Date(schedule.end_datetime).toLocaleString()}
+                              {convertUTCToLocalString(schedule.start_datetime)} - {convertUTCToLocalString(schedule.end_datetime)}
                             </p>
                           </div>
                         </div>

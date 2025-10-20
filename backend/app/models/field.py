@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Float, UniqueConstraint, Enum
 from sqlalchemy.orm import relationship
 from app.db.database import Base
-from datetime import datetime
+from datetime import datetime, timezone
 import enum
 
 class CollectionType(str, enum.Enum):
@@ -48,8 +48,8 @@ class Field(Base):
     reset_number = Column(Float, nullable=True)
     current_number = Column(Float, nullable=True)  # Persisted state
     
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
+    updated_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
 
     # Relationships
     collection = relationship("Collection", back_populates="fields")

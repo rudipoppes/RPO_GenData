@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Boolean, Enum
 from sqlalchemy.orm import relationship
 from app.db.database import Base
-from datetime import datetime
+from datetime import datetime, timezone
 import enum
 
 class APIKeyStatus(str, enum.Enum):
@@ -17,9 +17,9 @@ class APIKey(Base):
     key_hash = Column(String, nullable=False, index=True)  # Hashed full key
     label = Column(String, nullable=False)  # User-defined label
     status = Column(Enum(APIKeyStatus), default=APIKeyStatus.ACTIVE, nullable=False)
-    expires_at = Column(DateTime, nullable=True)
-    last_used_at = Column(DateTime, nullable=True)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    expires_at = Column(DateTime(timezone=True), nullable=True)
+    last_used_at = Column(DateTime(timezone=True), nullable=True)
+    created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
 
     # Relationships
     user = relationship("User", back_populates="api_keys")

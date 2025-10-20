@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session, joinedload
 from typing import List
-from datetime import datetime
+from datetime import datetime, timezone
 
 from app.db.database import get_db
 from app.models.user import User, UserRole
@@ -25,10 +25,20 @@ PERFORMANCE_NUMERIC_TYPES = [
 
 def compute_schedule_status(schedule: SpikeSchedule) -> str:
     """Compute schedule status based on current time."""
-    now = datetime.utcnow()
-    if now < schedule.start_datetime:
+    now = datetime.now(timezone.utc)
+    
+    # Ensure schedule datetimes are timezone-aware (SQLite workaround)
+    start_time = schedule.start_datetime
+    end_time = schedule.end_datetime
+    
+    if start_time.tzinfo is None:
+        start_time = start_time.replace(tzinfo=timezone.utc)
+    if end_time.tzinfo is None:
+        end_time = end_time.replace(tzinfo=timezone.utc)
+    
+    if now < start_time:
         return "scheduled"
-    elif now > schedule.end_datetime:
+    elif now > end_time:
         return "expired"
     else:
         return "active"
@@ -239,7 +249,7 @@ async def update_spike_schedule(
                     if value is not None:
                         setattr(spike_field, attr, value)
     
-    schedule.updated_at = datetime.utcnow()
+    schedule.updated_at = datetime.now(timezone.utc)
     db.commit()
     db.refresh(schedule)
     

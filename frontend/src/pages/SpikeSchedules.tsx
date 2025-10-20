@@ -159,7 +159,9 @@ export default function SpikeSchedules() {
   );
 
   const formatDateTime = (dateString: string) => {
-    return new Date(dateString).toLocaleString();
+    // Convert UTC datetime string to local timezone for display
+    const utcDate = new Date(dateString);
+    return utcDate.toLocaleString();
   };
 
   if (loading) {

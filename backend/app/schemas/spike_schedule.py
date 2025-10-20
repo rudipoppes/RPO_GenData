@@ -1,6 +1,6 @@
 from pydantic import BaseModel, validator
 from typing import Optional, List
-from datetime import datetime
+from datetime import datetime, timezone
 from app.models.field import CollectionType, ValueType
 
 class SpikeScheduleFieldCreate(BaseModel):
@@ -24,6 +24,18 @@ class SpikeScheduleCreate(BaseModel):
     end_datetime: datetime
     spike_fields: List[SpikeScheduleFieldCreate]  # Only modified fields sent from UI
     
+    @validator('start_datetime', pre=True)
+    def make_start_datetime_timezone_aware(cls, v):
+        if isinstance(v, datetime):
+            return v if v.tzinfo is not None else v.replace(tzinfo=timezone.utc)
+        return v
+    
+    @validator('end_datetime', pre=True)
+    def make_end_datetime_timezone_aware(cls, v):
+        if isinstance(v, datetime):
+            return v if v.tzinfo is not None else v.replace(tzinfo=timezone.utc)
+        return v
+    
     @validator('end_datetime')
     def end_after_start(cls, v, values):
         if 'start_datetime' in values and v <= values['start_datetime']:
@@ -35,6 +47,29 @@ class SpikeScheduleUpdate(BaseModel):
     start_datetime: Optional[datetime] = None
     end_datetime: Optional[datetime] = None
     spike_fields: Optional[List[SpikeScheduleFieldCreate]] = None
+    
+    @validator('start_datetime', pre=True)
+    def make_start_datetime_timezone_aware(cls, v):
+        if v is None:
+            return v
+        if isinstance(v, datetime):
+            return v if v.tzinfo is not None else v.replace(tzinfo=timezone.utc)
+        return v
+    
+    @validator('end_datetime', pre=True)
+    def make_end_datetime_timezone_aware(cls, v):
+        if v is None:
+            return v
+        if isinstance(v, datetime):
+            return v if v.tzinfo is not None else v.replace(tzinfo=timezone.utc)
+        return v
+    
+    @validator('end_datetime')
+    def end_after_start(cls, v, values):
+        if v is not None and 'start_datetime' in values and values['start_datetime'] is not None:
+            if v <= values['start_datetime']:
+                raise ValueError('end_datetime must be after start_datetime')
+        return v
 
 class SpikeScheduleFieldResponse(BaseModel):
     """Response includes all field data"""
@@ -76,4 +111,7 @@ class SpikeScheduleResponse(BaseModel):
     
     class Config:
         from_attributes = True
+        json_encoders = {
+            datetime: lambda v: v.isoformat() if v and v.tzinfo else v.isoformat() + '+00:00'
+        }
 
