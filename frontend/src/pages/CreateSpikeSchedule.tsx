@@ -20,6 +20,9 @@ export default function CreateSpikeSchedule() {
   const [selectedCollection, setSelectedCollection] = useState<Collection | null>(null);
   const [editableFields, setEditableFields] = useState<SpikeScheduleField[]>([]);
   
+  // Track if collection is pre-selected (and therefore locked)
+  const isCollectionLocked = Boolean(preselectedCollectionId);
+  
   const [formData, setFormData] = useState({
     name: '',
     start_datetime: '',
@@ -48,14 +51,17 @@ export default function CreateSpikeSchedule() {
 
   useEffect(() => {
     loadCollections();
+  }, []);
+
+  useEffect(() => {
     if (isEdit && id) {
       loadSpikeSchedule(parseInt(id));
-    } else if (preselectedCollectionId) {
-      // Auto-select the collection if provided via query param
+    } else if (preselectedCollectionId && collections.length > 0) {
+      // Auto-select the collection if provided via query param (only after collections are loaded)
       const collectionId = parseInt(preselectedCollectionId);
       handleCollectionChange(collectionId);
     }
-  }, [isEdit, id, preselectedCollectionId]);
+  }, [isEdit, id, preselectedCollectionId, collections]);
 
   const loadCollections = async () => {
     try {
@@ -363,21 +369,34 @@ export default function CreateSpikeSchedule() {
               <label htmlFor="collection" className="block text-sm font-medium text-gray-700">
                 Collection *
               </label>
-              <select
-                id="collection"
-                className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                value={selectedCollection?.id || ''}
-                onChange={(e) => handleCollectionChange(parseInt(e.target.value))}
-                required
-                disabled={isEdit}
-              >
-                <option value="">Select a collection</option>
-                {collections.map(collection => (
-                  <option key={collection.id} value={collection.id}>
-                    {collection.name}
-                  </option>
-                ))}
-              </select>
+              {isCollectionLocked ? (
+                <>
+                  <input
+                    type="text"
+                    id="collection"
+                    className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 shadow-sm bg-gray-50 text-gray-500"
+                    value={selectedCollection?.name || ''}
+                    disabled
+                  />
+                  <p className="mt-1 text-sm text-gray-500">Collection locked - cannot be changed</p>
+                </>
+              ) : (
+                <select
+                  id="collection"
+                  className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  value={selectedCollection?.id || ''}
+                  onChange={(e) => handleCollectionChange(parseInt(e.target.value))}
+                  required
+                  disabled={isEdit}
+                >
+                  <option value="">Select a collection</option>
+                  {collections.map(collection => (
+                    <option key={collection.id} value={collection.id}>
+                      {collection.name}
+                    </option>
+                  ))}
+                </select>
+              )}
             </div>
           </div>
 
