@@ -34,3 +34,8 @@ dist/
 # One-off test scripts
 backend/migrate_timezone_data.py
 backend/test_timezone_handling.py
+
+# Security and development files
+headers.txt
+auth_cookies.txt
+DEVELOPMENT_RULES.md
