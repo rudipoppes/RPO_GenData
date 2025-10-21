@@ -4,7 +4,9 @@ import os
 
 class Settings(BaseSettings):
     # Database
-    database_url: str = "sqlite:////home/ubuntu/RPO_GenData/data/gendata.db"
+    project_root: str = os.path.expanduser("~/RPO_GenData")
+    database_path: str = f"{project_root}/data/gendata.db"
+    database_url: str = f"sqlite:///{database_path}"
     
     # Security
     secret_key: str = "your-secret-key-change-this-in-production"
