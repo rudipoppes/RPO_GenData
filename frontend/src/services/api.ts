@@ -13,7 +13,10 @@ import type {
   UserCreate,
   UserUpdate,
   UserProfileUpdate,
-  PasswordChangeRequest
+  PasswordChangeRequest,
+  SpikeSchedule,
+  CreateSpikeScheduleRequest,
+  UpdateSpikeScheduleRequest
 } from '../types/api';
 import { SessionExpiredError, isAuthenticationError } from './errors';
 
@@ -125,6 +128,26 @@ export const adminApiService = {
     const response = await api.get('/admin/stats');
     return response.data;
   },
+};
+
+export const spikeSchedulesApi = {
+  list: (): Promise<SpikeSchedule[]> =>
+    api.get('/admin/spike-schedules').then(res => res.data),
+
+  listByCollection: (collectionId: number): Promise<SpikeSchedule[]> =>
+    api.get(`/admin/collections/${collectionId}/spike-schedules`).then(res => res.data),
+
+  get: (id: number): Promise<SpikeSchedule> =>
+    api.get(`/admin/spike-schedules/${id}`).then(res => res.data),
+
+  create: (schedule: CreateSpikeScheduleRequest): Promise<SpikeSchedule> =>
+    api.post('/admin/spike-schedules', schedule).then(res => res.data),
+
+  update: (id: number, schedule: UpdateSpikeScheduleRequest): Promise<SpikeSchedule> =>
+    api.patch(`/admin/spike-schedules/${id}`, schedule).then(res => res.data),
+
+  delete: (id: number): Promise<void> =>
+    api.delete(`/admin/spike-schedules/${id}`).then(res => res.data),
 };
 
 export const apiService = authApi;

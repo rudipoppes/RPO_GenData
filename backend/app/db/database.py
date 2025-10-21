@@ -29,4 +29,6 @@ def create_tables():
     from app.models.collection import Collection  
     from app.models.field import Field
     from app.models.api_key import ApiKey
+    from app.models.spike_schedule import SpikeSchedule
+    from app.models.spike_schedule_field import SpikeScheduleField
     Base.metadata.create_all(bind=engine)

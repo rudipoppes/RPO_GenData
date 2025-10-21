@@ -7,6 +7,9 @@ import Collections from './pages/Collections';
 import CollectionDetail from './pages/CollectionDetail';
 import CreateCollection from './pages/CreateCollection';
 import EditCollection from './pages/EditCollection';
+import SpikeSchedules from './pages/SpikeSchedules';
+import CreateSpikeSchedule from './pages/CreateSpikeSchedule';
+import EditSpikeSchedule from './pages/EditSpikeSchedule';
 import ApiKeys from './pages/ApiKeys';
 import Samples from './pages/Samples';
 import Users from './pages/Users';
@@ -58,6 +61,9 @@ function AuthenticatedApp() {
                 <Route path="/collections/new" element={<CreateCollection />} />
                 <Route path="/collections/:id" element={<CollectionDetail />} />
                 <Route path="/collections/:id/edit" element={<EditCollection />} />
+                <Route path="/spike-schedules" element={<SpikeSchedules />} />
+                <Route path="/spike-schedules/new" element={<CreateSpikeSchedule />} />
+                <Route path="/spike-schedules/:id/edit" element={<EditSpikeSchedule />} />
                 <Route path="/api-keys" element={<ApiKeys />} />
                 <Route path="/samples" element={<Samples />} />
                 <Route path="/users" element={<Users />} />

@@ -144,3 +144,79 @@ export interface PasswordChangeRequest {
   current_password: string;
   new_password: string;
 }
+
+// Spike Schedule Types
+export interface SpikeScheduleField {
+  id?: number;
+  original_field_id: number;
+  collection_type: "Performance" | "Configuration";
+  field_name: string;
+  value_type: 'TEXT_FIXED' | 'NUMBER_FIXED' | 'FLOAT_FIXED' | 'EPOCH_NOW' | 'NUMBER_RANGE' | 'FLOAT_RANGE' | 'INCREMENT' | 'DECREMENT';
+  is_editable: boolean;  // Only true for numeric performance types
+  
+  // All possible field values
+  fixed_value_text?: string;
+  fixed_value_number?: number;
+  fixed_value_float?: number;
+  range_start_number?: number;
+  range_end_number?: number;
+  range_start_float?: number;
+  range_end_float?: number;
+  float_precision?: number;
+  start_number?: number;
+  step_number?: number;
+  reset_number?: number;
+  current_number?: number;
+}
+
+export interface SpikeSchedule {
+  id: number;
+  collection_id: number;
+  collection_name: string;
+  name: string;
+  start_datetime: string;
+  end_datetime: string;
+  status: 'scheduled' | 'active' | 'expired';
+  spike_fields: SpikeScheduleField[];
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CreateSpikeScheduleRequest {
+  collection_id: number;
+  name: string;
+  start_datetime: string;
+  end_datetime: string;
+  spike_fields: Array<{
+    original_field_id: number;
+    fixed_value_number?: number;
+    fixed_value_float?: number;
+    range_start_number?: number;
+    range_end_number?: number;
+    range_start_float?: number;
+    range_end_float?: number;
+    float_precision?: number;
+    start_number?: number;
+    step_number?: number;
+    reset_number?: number;
+  }>;
+}
+
+export interface UpdateSpikeScheduleRequest {
+  name?: string;
+  start_datetime?: string;
+  end_datetime?: string;
+  spike_fields?: Array<{
+    original_field_id: number;
+    fixed_value_number?: number;
+    fixed_value_float?: number;
+    range_start_number?: number;
+    range_end_number?: number;
+    range_start_float?: number;
+    range_end_float?: number;
+    float_precision?: number;
+    start_number?: number;
+    step_number?: number;
+    reset_number?: number;
+  }>;
+}

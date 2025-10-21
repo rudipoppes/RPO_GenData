@@ -1,14 +1,15 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { collectionsApi, fieldsApi } from '../services/api';
-import type { Collection, Field, CreateFieldRequest } from '../types/api';
+import { collectionsApi, fieldsApi, spikeSchedulesApi } from '../services/api';
+import type { Collection, Field, CreateFieldRequest, SpikeSchedule } from '../types/api';
 
 export default function CollectionDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [collection, setCollection] = useState<Collection | null>(null);
   const [fields, setFields] = useState<Field[]>([]);
-  const [activeTab, setActiveTab] = useState<'Performance' | 'Configuration'>('Performance');
+  const [spikeSchedules, setSpikeSchedules] = useState<SpikeSchedule[]>([]);
+  const [activeTab, setActiveTab] = useState<'Performance' | 'Configuration' | 'Spikes'>('Performance');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [showAddField, setShowAddField] = useState(false);
@@ -26,6 +27,13 @@ export default function CollectionDetail() {
 
   const collectionId = parseInt(id || '0');
 
+  // Helper function to convert UTC datetime string to local timezone string for display
+  const convertUTCToLocalString = (utcDateStr: string): string => {
+    // Convert string to Date object and return local timezone representation
+    const utcDate = new Date(utcDateStr);
+    return utcDate.toLocaleString();
+  };
+
   useEffect(() => {
     if (collectionId) {
       loadCollection();
@@ -33,7 +41,9 @@ export default function CollectionDetail() {
   }, [collectionId]);
 
   useEffect(() => {
-    setNewField(prev => ({ ...prev, collection_type: activeTab }));
+    if (activeTab === 'Performance' || activeTab === 'Configuration') {
+      setNewField(prev => ({ ...prev, collection_type: activeTab }));
+    }
   }, [activeTab]);
 
   const loadCollection = async () => {
@@ -42,6 +52,10 @@ export default function CollectionDetail() {
       const collectionData = await collectionsApi.get(collectionId);
       setCollection(collectionData);
       setFields(collectionData.fields || []);
+      
+      // Load spike schedules for this collection
+      const schedules = await spikeSchedulesApi.listByCollection(collectionId);
+      setSpikeSchedules(schedules);
     } catch (err: any) {
       setError(err.response?.data?.detail || 'Failed to load collection');
     } finally {
@@ -116,7 +130,7 @@ export default function CollectionDetail() {
       } else {
         // Create new field
         const fieldData: CreateFieldRequest = {
-          collection_type: activeTab,
+          collection_type: activeTab === 'Spikes' ? 'Performance' : activeTab,
           field_name: newField.field_name,
           value_type: newField.value_type,
           ...(newField.fixed_value_text && { fixed_value_text: newField.fixed_value_text }),
@@ -139,7 +153,7 @@ export default function CollectionDetail() {
                   setEditingField(null);
       setEditingField(null);
       setNewField({
-        collection_type: activeTab,
+        collection_type: activeTab === 'Spikes' ? 'Performance' : activeTab,
         field_name: "",
         value_type: "TEXT_FIXED"
       });
@@ -150,6 +164,7 @@ export default function CollectionDetail() {
   };
 
   const getFilteredFields = () => {
+    if (activeTab === 'Spikes') return [];
     return fields.filter(field => field.collection_type === activeTab);
   };
 
@@ -391,6 +406,12 @@ export default function CollectionDetail() {
           </div>
           <div className="flex space-x-3">
             <Link
+              to={`/spike-schedules/new?collection_id=${collection.id}`}
+              className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            >
+              Create Spike
+            </Link>
+            <Link
               to={`/collections/${collection.id}/edit`}
               className="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
             >
@@ -415,7 +436,7 @@ export default function CollectionDetail() {
       {/* Tabs */}
       <div className="border-b border-gray-200 mb-6">
         <nav className="-mb-px flex space-x-8">
-          {(['Performance', 'Configuration'] as const).map((tab) => (
+          {(['Performance', 'Configuration', 'Spikes'] as const).map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -426,24 +447,126 @@ export default function CollectionDetail() {
               }`}
             >
               {tab}
+              {tab === 'Spikes' && spikeSchedules.length > 0 && (
+                <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                  {spikeSchedules.length}
+                </span>
+              )}
             </button>
           ))}
         </nav>
       </div>
 
-      {/* Fields Section */}
-      <div className="bg-white shadow rounded-lg">
-        <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-          <h2 className="text-lg font-medium text-gray-900">
-            {activeTab} Fields
-          </h2>
-          <button
-            onClick={() => setShowAddField(true)}
-            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-          >
-            Add Field
-          </button>
+      {/* Content Section */}
+      {activeTab === 'Spikes' ? (
+        /* Spike Schedules Section */
+        <div className="bg-white shadow rounded-lg">
+          <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+            <h2 className="text-lg font-medium text-gray-900">
+              Spike Schedules
+            </h2>
+            <Link
+              to={`/spike-schedules/new?collection_id=${collectionId}`}
+              className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            >
+              Create Spike Schedule
+            </Link>
+          </div>
+
+          <div className="p-6">
+            {spikeSchedules.length === 0 ? (
+              <div className="text-center py-8">
+                <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+                <h3 className="mt-2 text-sm font-medium text-gray-900">No spike schedules</h3>
+                <p className="mt-1 text-sm text-gray-500">Get started by creating a new spike schedule for this collection.</p>
+                <div className="mt-6">
+                  <Link
+                    to={`/spike-schedules/new?collection_id=${collectionId}`}
+                    className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                  >
+                    <svg className="-ml-1 mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
+                    Create Spike Schedule
+                  </Link>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {spikeSchedules.map((schedule) => (
+                  <div key={schedule.id} className="border border-gray-200 rounded-lg p-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center">
+                        <div className="flex-shrink-0">
+                          <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
+                            <svg className="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                            </svg>
+                          </div>
+                        </div>
+                        <div className="ml-4">
+                          <div className="flex items-center">
+                            <p className="text-sm font-medium text-gray-900">{schedule.name}</p>
+                            <span className={`ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                              schedule.status === 'active' ? 'bg-green-100 text-green-800' :
+                              schedule.status === 'scheduled' ? 'bg-blue-100 text-blue-800' :
+                              'bg-gray-100 text-gray-800'
+                            }`}>
+                              {schedule.status}
+                            </span>
+                          </div>
+                          <div className="mt-1">
+                            <p className="text-sm text-gray-500">
+                              {convertUTCToLocalString(schedule.start_datetime)} - {convertUTCToLocalString(schedule.end_datetime)}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Link
+                          to={`/spike-schedules/${schedule.id}/edit`}
+                          className="text-blue-600 hover:text-blue-900 text-sm font-medium"
+                        >
+                          Edit
+                        </Link>
+                        <button
+                          onClick={() => {
+                            if (window.confirm('Are you sure you want to delete this spike schedule?')) {
+                              spikeSchedulesApi.delete(schedule.id).then(() => {
+                                loadCollection(); // Reload to refresh the list
+                              }).catch(err => {
+                                setError(err.response?.data?.detail || 'Failed to delete spike schedule');
+                              });
+                            }
+                          }}
+                          className="text-red-600 hover:text-red-900 text-sm font-medium"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
+      ) : (
+        /* Fields Section */
+        <div className="bg-white shadow rounded-lg">
+          <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+            <h2 className="text-lg font-medium text-gray-900">
+              {activeTab} Fields
+            </h2>
+            <button
+              onClick={() => setShowAddField(true)}
+              className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            >
+              Add Field
+            </button>
+          </div>
 
         <div className="p-6">
           {getFilteredFields().length === 0 ? (
@@ -516,6 +639,7 @@ export default function CollectionDetail() {
           )}
         </div>
       </div>
+      )}
 
       {/* Add Field Modal/Form */}
       {showAddField && (
@@ -530,7 +654,7 @@ export default function CollectionDetail() {
                     setEditingField(null);
                     setError('');
                     setNewField({
-                      collection_type: activeTab,
+                      collection_type: activeTab === 'Spikes' ? 'Performance' : activeTab,
                       field_name: '',
                       value_type: 'TEXT_FIXED'
                     });
@@ -584,7 +708,7 @@ export default function CollectionDetail() {
                     setEditingField(null);
                     setError('');
                     setNewField({
-                      collection_type: activeTab,
+                      collection_type: activeTab === 'Spikes' ? 'Performance' : activeTab,
                       field_name: '',
                       value_type: 'TEXT_FIXED'
                     });
