@@ -9,8 +9,8 @@ This guide provides safe deployment instructions for the RPO GenData service on 
 git clone <repository-url>
 cd RPO_GenData
 
-# 2. Switch to deployment branch
-git checkout deployment-safe-config
+# 2. Switch to main branch (contains deployment system)
+git checkout main
 
 # 3. Copy environment template
 cp .env.template .env
