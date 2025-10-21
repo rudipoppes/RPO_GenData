@@ -30,3 +30,7 @@ dist/
 
 # EXCEPTION: Allow project design database backups
 !project_design_docs/*.db
+
+# One-off test scripts
+backend/migrate_timezone_data.py
+backend/test_timezone_handling.py

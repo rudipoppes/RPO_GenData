@@ -30,6 +30,11 @@ A FastAPI-based service for generating dynamic test data with configurable field
 
 3. **Run the complete service:**
    ```bash
+   nohup ./start_service.sh > service.log 2>&1 &
+   ```
+   or in the foreground
+
+   ```bash
    ./start_service.sh
    ```
 
