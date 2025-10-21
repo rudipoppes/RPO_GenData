@@ -83,7 +83,7 @@ export default function CreateCollection() {
               required
             />
             <p className="mt-1 text-sm text-gray-500">
-              Choose a descriptive name for your data collection.
+              The Name of your Collection MUST be the EXACT name of your Device in Skylar1.
             </p>
           </div>
 
