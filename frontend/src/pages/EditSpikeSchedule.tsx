@@ -24,6 +24,10 @@ export default function EditSpikeSchedule() {
     end_datetime: ''
   });
 
+  const PERFORMANCE_NUMERIC_TYPES = [
+    'NUMBER_FIXED', 'FLOAT_FIXED', 'NUMBER_RANGE', 'FLOAT_RANGE', 'INCREMENT', 'DECREMENT'
+  ];
+
   // Helper function to convert local datetime input to UTC ISO string
   const convertLocalDateTimeToUTC = (localDateTime: string): string => {
     if (!localDateTime) return '';
@@ -59,7 +63,12 @@ export default function EditSpikeSchedule() {
       // Find the collection
       const collection = await collectionsApi.get(schedule.collection_id);
       setSelectedCollection(collection);
-      setEditableFields(schedule.spike_fields.filter(f => f.is_editable));
+      // Filter for Performance fields only, same as Create page
+      setEditableFields(schedule.spike_fields.filter(f => 
+        f.is_editable && 
+        f.collection_type === 'Performance' && 
+        PERFORMANCE_NUMERIC_TYPES.includes(f.value_type)
+      ));
     } catch (err: any) {
       setError('Failed to load spike schedule');
     } finally {
