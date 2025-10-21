@@ -216,108 +216,140 @@ export default function CreateSpikeSchedule() {
     switch (field.value_type) {
       case 'NUMBER_FIXED':
         return (
-          <input
-            type="number"
-            className={baseClasses}
-            value={field.fixed_value_number || ''}
-            onChange={(e) => handleFieldChange(field.original_field_id, 'fixed_value_number', e.target.value ? parseInt(e.target.value) : undefined)}
-            placeholder="Enter number"
-          />
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Fixed Number Value</label>
+            <input
+              type="number"
+              className={baseClasses}
+              value={field.fixed_value_number || ''}
+              onChange={(e) => handleFieldChange(field.original_field_id, 'fixed_value_number', e.target.value ? parseInt(e.target.value) : undefined)}
+              placeholder="Enter number"
+            />
+          </div>
         );
       
       case 'FLOAT_FIXED':
         return (
-          <input
-            type="number"
-            step="any"
-            className={baseClasses}
-            value={field.fixed_value_float || ''}
-            onChange={(e) => handleFieldChange(field.original_field_id, 'fixed_value_float', e.target.value ? parseFloat(e.target.value) : undefined)}
-            placeholder="Enter float"
-          />
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Fixed Float Value</label>
+            <input
+              type="number"
+              step="any"
+              className={baseClasses}
+              value={field.fixed_value_float || ''}
+              onChange={(e) => handleFieldChange(field.original_field_id, 'fixed_value_float', e.target.value ? parseFloat(e.target.value) : undefined)}
+              placeholder="Enter float"
+            />
+          </div>
         );
       
       case 'NUMBER_RANGE':
         return (
-          <div className="grid grid-cols-2 gap-2">
-            <input
-              type="number"
-              className={baseClasses}
-              value={field.range_start_number || ''}
-              onChange={(e) => handleFieldChange(field.original_field_id, 'range_start_number', e.target.value ? parseInt(e.target.value) : undefined)}
-              placeholder="Start"
-            />
-            <input
-              type="number"
-              className={baseClasses}
-              value={field.range_end_number || ''}
-              onChange={(e) => handleFieldChange(field.original_field_id, 'range_end_number', e.target.value ? parseInt(e.target.value) : undefined)}
-              placeholder="End"
-            />
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Start Number</label>
+              <input
+                type="number"
+                className={baseClasses}
+                value={field.range_start_number || ''}
+                onChange={(e) => handleFieldChange(field.original_field_id, 'range_start_number', e.target.value ? parseInt(e.target.value) : undefined)}
+                placeholder="Min value"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">End Number</label>
+              <input
+                type="number"
+                className={baseClasses}
+                value={field.range_end_number || ''}
+                onChange={(e) => handleFieldChange(field.original_field_id, 'range_end_number', e.target.value ? parseInt(e.target.value) : undefined)}
+                placeholder="Max value"
+              />
+            </div>
           </div>
         );
       
       case 'FLOAT_RANGE':
         return (
-          <div className="space-y-2">
-            <div className="grid grid-cols-2 gap-2">
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Start Float</label>
+                <input
+                  type="number"
+                  step="any"
+                  className={baseClasses}
+                  value={field.range_start_float || ''}
+                  onChange={(e) => handleFieldChange(field.original_field_id, 'range_start_float', e.target.value ? parseFloat(e.target.value) : undefined)}
+                  placeholder="Min value"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">End Float</label>
+                <input
+                  type="number"
+                  step="any"
+                  className={baseClasses}
+                  value={field.range_end_float || ''}
+                  onChange={(e) => handleFieldChange(field.original_field_id, 'range_end_float', e.target.value ? parseFloat(e.target.value) : undefined)}
+                  placeholder="Max value"
+                />
+              </div>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Float Precision</label>
               <input
                 type="number"
-                step="any"
+                min="0"
+                max="10"
                 className={baseClasses}
-                value={field.range_start_float || ''}
-                onChange={(e) => handleFieldChange(field.original_field_id, 'range_start_float', e.target.value ? parseFloat(e.target.value) : undefined)}
-                placeholder="Start"
-              />
-              <input
-                type="number"
-                step="any"
-                className={baseClasses}
-                value={field.range_end_float || ''}
-                onChange={(e) => handleFieldChange(field.original_field_id, 'range_end_float', e.target.value ? parseFloat(e.target.value) : undefined)}
-                placeholder="End"
+                value={field.float_precision || ''}
+                onChange={(e) => handleFieldChange(field.original_field_id, 'float_precision', e.target.value ? parseInt(e.target.value) : undefined)}
+                placeholder="Decimal places"
               />
             </div>
-            <input
-              type="number"
-              min="0"
-              max="10"
-              className={baseClasses}
-              value={field.float_precision || ''}
-              onChange={(e) => handleFieldChange(field.original_field_id, 'float_precision', e.target.value ? parseInt(e.target.value) : undefined)}
-              placeholder="Precision (0-10)"
-            />
           </div>
         );
       
       case 'INCREMENT':
       case 'DECREMENT':
         return (
-          <div className="space-y-2">
-            <input
-              type="number"
-              step="any"
-              className={baseClasses}
-              value={field.start_number || ''}
-              onChange={(e) => handleFieldChange(field.original_field_id, 'start_number', e.target.value ? parseFloat(e.target.value) : undefined)}
-              placeholder="Start number"
-            />
-            <input
-              type="number"
-              step="any"
-              className={baseClasses}
-              value={field.step_number || ''}
-              onChange={(e) => handleFieldChange(field.original_field_id, 'step_number', e.target.value ? parseFloat(e.target.value) : undefined)}
-              placeholder="Step number"
-            />
-            <input
-              type="number"
-              step="any"
-              className={baseClasses}
-              value={field.reset_number || ''}
-              onChange={(e) => handleFieldChange(field.original_field_id, 'reset_number', e.target.value ? parseFloat(e.target.value) : undefined)}
-              placeholder="Reset number"
-            />
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Start Value</label>
+                <input
+                  type="number"
+                  step="any"
+                  className={baseClasses}
+                  value={field.start_number || ''}
+                  onChange={(e) => handleFieldChange(field.original_field_id, 'start_number', e.target.value ? parseFloat(e.target.value) : undefined)}
+                  placeholder="Starting number"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Step Value</label>
+                <input
+                  type="number"
+                  step="any"
+                  className={baseClasses}
+                  value={field.step_number || ''}
+                  onChange={(e) => handleFieldChange(field.original_field_id, 'step_number', e.target.value ? parseFloat(e.target.value) : undefined)}
+                  placeholder="Increment/decrement by"
+                />
+              </div>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Reset Threshold (Optional)</label>
+              <input
+                type="number"
+                step="any"
+                className={baseClasses}
+                value={field.reset_number || ''}
+                onChange={(e) => handleFieldChange(field.original_field_id, 'reset_number', e.target.value ? parseFloat(e.target.value) : undefined)}
+                placeholder="Reset to start when threshold reached"
+              />
+            </div>
           </div>
         );
       
