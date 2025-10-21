@@ -179,7 +179,7 @@ export default function SpikeSchedules() {
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Spike Schedules</h1>
             <p className="mt-2 text-gray-600">
-              Manage time-bound field value variations for performance testing
+              Manage time-bound field value variations for Anomaly detection
             </p>
           </div>
           <div className="flex space-x-3">
