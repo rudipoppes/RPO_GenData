@@ -48,10 +48,11 @@ Copy `.env.template` to `.env` and update these values:
 - `SECRET_KEY` - Generate a secure random key
 - `HOST` - Server binding IP (0.0.0.0 for external access)
 - `PORT` - Service port (default: 8088)
+- `BACKEND_CORS_ORIGINS` - Update with your server's IP (e.g., `["http://YOUR_IP:8088"]`)
 
 **Security Settings:**
 - Change `SECRET_KEY` from default
-- Update `BACKEND_CORS_ORIGINS` with your server domain
+- Update `BACKEND_CORS_ORIGINS` with your server IP/domain (e.g., `["http://YOUR_SERVER_IP:8088"]`)
 - Set `GH_TOKEN` only if GitHub API access is needed
 
 ### 2. Database Path Updates
