@@ -52,9 +52,43 @@ DATA_DIR="${DATA_DIR:-$PROJECT_ROOT/data}"
 [ -d "backend" ] && print_status 0 "Backend directory exists" || print_status 1 "Backend directory missing"
 [ -d "frontend" ] && print_status 0 "Frontend directory exists" || print_status 1 "Frontend directory missing"
 
-# 3. Check Python environment
+# 3. Check system dependencies
 echo
-echo "3. Checking Python environment..."
+echo "3. Checking system dependencies..."
+
+# Check Python 3
+if command -v python3 &> /dev/null; then
+    PYTHON_VERSION=$(python3 -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')")
+    print_status 0 "Python $PYTHON_VERSION found"
+else
+    print_status 1 "Python 3 not found. Install: sudo apt install python3 python3-pip"
+fi
+
+# Check python3-venv package
+if python3 -m venv --help &> /dev/null; then
+    print_status 0 "python3-venv is available"
+else
+    print_status 1 "python3-venv not found. Install: sudo apt install python3${PYTHON_VERSION}-venv"
+fi
+
+# Check Node.js
+if command -v node &> /dev/null; then
+    NODE_VERSION=$(node --version)
+    print_status 0 "Node.js $NODE_VERSION found"
+else
+    print_status 1 "Node.js not found. Install: sudo apt install nodejs npm"
+fi
+
+# Check npm
+if command -v npm &> /dev/null; then
+    print_status 0 "npm found"
+else
+    print_status 1 "npm not found. Install: sudo apt install npm"
+fi
+
+# 4. Check Python environment
+echo
+echo "4. Checking Python environment..."
 if [ -d "backend/venv" ]; then
     print_status 0 "Python virtual environment exists"
     
@@ -63,13 +97,12 @@ if [ -d "backend/venv" ]; then
     python -c "import fastapi, uvicorn, sqlalchemy, alembic" 2>/dev/null
     print_status 0 "Python dependencies are installed"
 else
-    print_warning "Virtual environment not found"
-    print_info "Run: cd backend && python3 -m venv venv && source venv/bin/activate && pip install -r requirements.txt"
+    print_warning "Virtual environment not found - will be created during deployment"
 fi
 
-# 4. Check database configuration
+# 5. Check database configuration
 echo
-echo "4. Validating database configuration..."
+echo "5. Validating database configuration..."
 DATABASE_PATH="${DATABASE_PATH:-$DATA_DIR/gendata.db}"
 
 if [ -f "$DATABASE_PATH" ]; then
@@ -92,9 +125,9 @@ else
     print_info "Database will be created automatically when service starts"
 fi
 
-# 5. Check frontend build
+# 6. Check frontend build
 echo
-echo "5. Validating frontend build..."
+echo "6. Validating frontend build..."
 if [ -d "frontend/dist" ] && [ "$(ls -A frontend/dist)" ]; then
     print_status 0 "Frontend build exists"
 else
@@ -102,15 +135,15 @@ else
     print_info "Run: cd frontend && npm install && npm run build"
 fi
 
-# 6. Check configuration files
+# 7. Check configuration files
 echo
-echo "6. Validating configuration files..."
+echo "7. Validating configuration files..."
 [ -f "backend/app/core/config.py" ] && print_status 0 "Backend configuration exists" || print_status 1 "Backend configuration missing"
 [ -f "backend/alembic.ini" ] && print_status 0 "Alembic configuration exists" || print_status 1 "Alembic configuration missing"
 
-# 7. Check for security issues
+# 8. Check for security issues
 echo
-echo "7. Security validation..."
+echo "8. Security validation..."
 if grep -r "your-secret-key-change-this-in-production" backend/app/core/config.py > /dev/null; then
     print_warning "Default secret key detected - should be changed in production"
 fi

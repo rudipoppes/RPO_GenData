@@ -92,14 +92,23 @@ echo "Service Port: ${PORT:-8088}"
 # 5. Setup virtual environment and dependencies
 echo
 echo "5. Setting up Python environment..."
+
+# Check if python3-venv is available before creating venv
+if ! python3 -m venv --help &> /dev/null; then
+    print_status 1 "python3-venv not available. Install: sudo apt install python3-venv"
+fi
+
 if [ ! -d "backend/venv" ]; then
     print_info "Creating virtual environment..."
     cd backend
-    python3 -m venv venv
-    source venv/bin/activate
-    pip install -r requirements.txt
-    cd ..
-    print_status 0 "Virtual environment created"
+    if python3 -m venv venv; then
+        source venv/bin/activate
+        pip install -r requirements.txt
+        cd ..
+        print_status 0 "Virtual environment created"
+    else
+        print_status 1 "Failed to create virtual environment. Install python3-venv package"
+    fi
 else
     print_info "Virtual environment exists, ensuring dependencies..."
     cd backend
