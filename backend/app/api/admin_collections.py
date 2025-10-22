@@ -448,20 +448,28 @@ class CopyCollectionResponse(BaseModel):
 async def copy_collection(
     collection_id: int,
     request: CopyCollectionRequest,
-    current_user: User = Depends(get_current_admin_user),
+    current_user: User = Depends(get_current_admin_or_editor_user),
     db: Session = Depends(get_db)
 ):
     """
     Copy a collection multiple times with all its fields.
     New collections are owned by the current user.
     """
+    from app.models.user import UserRole
     
-    # Get the original collection
-    original_collection = db.query(Collection).filter(Collection.id == collection_id).first()
+    # Get the original collection with owner
+    original_collection = db.query(Collection).options(joinedload(Collection.owner)).filter(Collection.id == collection_id).first()
     if not original_collection:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Collection not found"
+        )
+    
+    # Check access permissions
+    if current_user.role != UserRole.ADMIN and original_collection.owner_id != current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Access denied to this collection"
         )
     
     # Get all fields from the original collection  
