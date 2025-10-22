@@ -39,3 +39,8 @@ backend/test_timezone_handling.py
 headers.txt
 auth_cookies.txt
 DEVELOPMENT_RULES.md
+
+# Build and dependency directories (should never be in repo)
+backend/venv/
+frontend/node_modules/
+frontend/dist/

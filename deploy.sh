@@ -89,7 +89,7 @@ echo "Project Root: $PROJECT_ROOT"
 echo "Database Path: $DATABASE_PATH"
 echo "Service Port: ${PORT:-8088}"
 
-# 5. Setup virtual environment (if needed)
+# 5. Setup virtual environment and dependencies
 echo
 echo "5. Setting up Python environment..."
 if [ ! -d "backend/venv" ]; then
@@ -101,7 +101,12 @@ if [ ! -d "backend/venv" ]; then
     cd ..
     print_status 0 "Virtual environment created"
 else
-    print_status 0 "Virtual environment exists"
+    print_info "Virtual environment exists, ensuring dependencies..."
+    cd backend
+    source venv/bin/activate
+    pip install -r requirements.txt --upgrade --quiet
+    cd ..
+    print_status 0 "Dependencies updated"
 fi
 
 # 6. Build frontend
