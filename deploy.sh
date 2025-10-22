@@ -103,6 +103,7 @@ if [ ! -d "backend/venv" ]; then
     cd backend
     if python3 -m venv venv; then
         source venv/bin/activate
+        pip install pydantic-settings 2>/dev/null
         pip install -r requirements.txt
         cd ..
         print_status 0 "Virtual environment created"
@@ -113,6 +114,7 @@ else
     print_info "Virtual environment exists, ensuring dependencies..."
     cd backend
     source venv/bin/activate
+    pip install pydantic-settings 2>/dev/null
     pip install -r requirements.txt --upgrade --quiet
     cd ..
     print_status 0 "Dependencies updated"

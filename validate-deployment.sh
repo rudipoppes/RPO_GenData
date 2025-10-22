@@ -89,12 +89,12 @@ fi
 # 4. Check Python environment
 echo
 echo "4. Checking Python environment..."
-if [ -d "backend/venv" ]; then
+if [ -d "backend/venv" ] && [ -f "backend/venv/bin/activate" ]; then
     print_status 0 "Python virtual environment exists"
     
     # Activate virtual environment and check dependencies
     source backend/venv/bin/activate
-    python -c "import fastapi, uvicorn, sqlalchemy, alembic" 2>/dev/null
+    python -c "import fastapi, uvicorn, sqlalchemy, alembic, pydantic_settings" 2>/dev/null
     print_status 0 "Python dependencies are installed"
 else
     print_warning "Virtual environment not found - will be created during deployment"
