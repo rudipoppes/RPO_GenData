@@ -1,178 +1,192 @@
-# Data Generator Service
+# RPO GenData Service
 
 A FastAPI-based service for generating dynamic test data with configurable fields and types, featuring a React admin interface.
 
-## Features
+## 🚀 Production Deployment
 
-- **Backend API**: FastAPI service with SQLite database
-- **Admin UI**: React-based web interface for managing collections and API keys
-- **Authentication**: Cookie-based session authentication for admin interface
-- **Data Generation**: Configurable fields with multiple value types (fixed, ranges, patterns, etc.)
-- **API Key Management**: Scoped API keys for external data access
-- **Import/Export**: JSON-based configuration management
+### Quick Start
 
-## Quick Start
+```bash
+# Clone repository
+git clone https://github.com/rudipoppes/RPO_GenData.git
+cd RPO_GenData
 
-1. **Setup the backend environment:**
-   ```bash
-   cd backend
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
-   pip install -r requirements.txt
-   ```
+# Validate system requirements
+./validate-deployment.sh
 
-2. **Build the frontend:**
-   ```bash
-   cd frontend
-   npm install
-   npm run build
-   ```
+# Run one-command deployment
+./deploy.sh production
+```
 
-3. **Run the complete service:**
-   ```bash
-   nohup ./start_service.sh > service.log 2>&1 &
-   ```
-   or in the foreground
+### System Requirements
 
-   ```bash
-   ./start_service.sh
-   ```
+**Ubuntu/Debian:**
+```bash
+# Install Node.js (if not available)
+curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+sudo apt-get install -y nodejs npm
+```
 
-The service will be accessible on **port 8088**:
-- **Admin UI**: http://localhost:8088/
-- **API Documentation**: http://localhost:8088/api/docs
-- **Health Check**: http://localhost:8088/api/health
+**Python 3.12+** (usually pre-installed)
 
-## Authentication
+### Access Information
 
-The service uses **cookie-based authentication** for the admin interface:
+After deployment, the service will be accessible at:
+- **Frontend**: `http://your-server:8088/`
+- **Admin Interface**: `http://your-server:8088/admin`
+- **API Documentation**: `http://your-server:8088/api/docs`
+- **Health Check**: `http://your-server:8088/api/health`
 
-- **Admin Login**: Use the admin UI at http://localhost:8088/
-- **Initial Setup**: Admin user is created automatically on first startup
-- **Session Management**: Login sessions are handled via secure HTTP cookies
+### ⚠️ Default Credentials
 
-## API Endpoints
+**IMPORTANT: Change after first login!**
 
-### Authentication Endpoints
-- `POST /api/auth/login` - Login with email/password
-- `GET /api/auth/me` - Get current user information
-- `POST /api/auth/logout` - Logout and clear session
+- **Email**: `admin@example.com`
+- **Password**: `admin123`
+- **Username**: `admin`
 
-### Admin Endpoints (Authentication Required)
-- `GET /api/admin/collections` - List collections
-- `POST /api/admin/collections` - Create new collection
-- `GET /api/admin/api-keys` - List API keys
-- `POST /api/admin/api-keys` - Generate new API key
+### Deployment Scripts
 
-### Public Data Generation (API Key Required)
-- `GET /api/data/{collection_name}/{collection_type}` - Generate data for collection
+**Validation (Pre-deployment):**
+```bash
+./validate-deployment.sh
+```
+✅ Checks system dependencies (Python 3.12+, Node.js, npm)
+✅ Validates python3-venv availability
+✅ Validates directory structure
+✅ Validates configuration files
+✅ Provides clear installation instructions for missing packages
 
-## Project Structure
+**Deployment:**
+```bash
+./deploy.sh production
+```
+✅ Creates virtual environment properly
+✅ Installs all Python dependencies including pydantic-settings
+✅ Builds frontend application
+✅ Runs database migrations
+✅ Starts service with health checks
+✅ Automatic error handling and rollback capability
+
+**Manual Service Start:**
+```bash
+# Foreground:
+./start_service.sh
+
+# Background:
+nohup ./start_service.sh > service.log 2>&1 &
+```
+
+**Rollback (if needed):**
+```bash
+./rollback.sh <timestamp>
+```
+
+**Note:** The `build.sh` script is outdated and redundant. Use `deploy.sh` instead for complete deployment.
+
+### Configuration
+
+Environment variables configured via `.env` file:
+```bash
+# Copy template and customize
+cp .env.template .env
+
+# Key settings to update:
+PROJECT_ROOT=/path/to/your/RPO_GenData
+SECRET_KEY=generate-secure-random-key
+BACKEND_CORS_ORIGINS='["http://your-server:8088"]'
+```
+
+### Features
+
+- **🔐 Authentication**: Cookie-based session management for admin interface
+- **📊 Data Generation**: Configurable fields (fixed, ranges, patterns, timestamps)
+- **🔑 API Keys**: Scoped access with fine-grained permissions
+- **⚙️ Admin UI**: React-based interface for collections and configuration
+- **🔄 Database Migrations**: Alembic-based version control
+- **📋 Import/Export**: JSON-based configuration management
+- **🏥 Health Checks**: Built-in health monitoring endpoints
+
+### Project Structure
 
 ```
+RPO_GenData/
 ├── backend/              # FastAPI backend
-│   ├── app/
-│   │   ├── api/         # API route handlers
-│   │   ├── auth/        # Authentication modules
-│   │   ├── models/      # SQLAlchemy models
-│   │   ├── schemas/     # Pydantic schemas
-│   │   └── main.py      # FastAPI app
-│   ├── start_server.py  # Server startup script
-│   └── requirements.txt # Python dependencies
+│   ├── app/            # Application modules
+│   ├── venv/           # Python virtual environment (auto-created)
+│   ├── requirements.txt # Python dependencies
+│   └── start_server.py  # Server startup
 ├── frontend/            # React frontend
-│   ├── src/
-│   │   ├── components/  # React components
-│   │   ├── pages/       # Page components
-│   │   ├── services/    # API services
-│   │   └── types/       # TypeScript types
-│   └── dist/           # Built frontend files
-├── docs/               # Documentation
-├── start_service.sh    # Service launcher
-└── AUTHENTICATION_FIX.md # Authentication troubleshooting guide
+│   ├── dist/           # Built files (auto-created)
+│   └── package.json    # Node dependencies
+├── data/               # Database directory (auto-created)
+├── .env.template        # Configuration template
+├── deploy.sh           # Main deployment script
+├── validate-deployment.sh # System validation
+├── start_service.sh    # Service starter
+└── rollback.sh         # Emergency rollback
 ```
 
-## Port Configuration
+### API Usage
 
-The service runs on **port 8088** to avoid conflicts with existing services on ports 3000 and 4000, as specified in the solution requirements.
+**Authentication:**
+```bash
+# Admin login (returns cookie for subsequent requests)
+curl -c cookies.txt -X POST http://your-server:8088/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email": "admin@example.com", "password": "admin123"}'
+```
 
-## Development
+**Data Generation:**
+```bash
+# Requires API key (from admin interface or manual creation)
+curl -H "X-API-Key: your-api-key" \
+  http://your-server:8088/api/data/YourCollection/Performance
+```
 
-For development with hot reloading:
+### Development
 
-**Backend only:**
+**For development with hot reloading:**
+
+**Backend:**
 ```bash
 cd backend
 source venv/bin/activate
 python start_server.py
 ```
 
-**Frontend only (dev server):**
+**Frontend:**
 ```bash
 cd frontend
-npm run dev  # Runs on port 8088 with proxy to backend
+npm install
+npm run build  # Production build
+npm run dev    # Development server (if needed)
 ```
 
-## Troubleshooting
+### Troubleshooting
 
-### Authentication Issues
-If you experience login problems, see [AUTHENTICATION_FIX.md](./AUTHENTICATION_FIX.md) for detailed troubleshooting information.
+**Port 8088 not accessible:**
+1. Check firewall: `sudo ufw allow 8088`
+2. Verify service is running: `ps aux | grep "python start_server.py"`
+3. Check service logs: `tail -f service.log`
+4. Verify service binding: `ss -tulpn | grep 8088`
 
-### Port Conflicts
-If port 8088 is not accessible:
-1. Check AWS Security Group allows inbound traffic on port 8088
-2. Verify no firewall is blocking the port
-3. Confirm the service is binding to `0.0.0.0:8088`
+**Virtual environment issues:**
+- Recreate venv: `cd backend && rm -rf venv && python3 -m venv venv`
+- Install dependencies: `source venv/bin/activate && pip install -r requirements.txt`
 
-## API Usage Examples
+**Database issues:**
+- Run migrations: `cd backend && source venv/bin/activate && alembic upgrade head`
+- Check database: `sqlite3 ../data/gendata.db ".tables"`
 
-### Admin Authentication
-```bash
-# Login
-curl -c cookies.txt -X POST http://localhost:8088/api/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"email": "admin@example.com", "password": "admin123"}'
+**Frontend build issues:**
+- Install dependencies: `cd frontend && npm install`
+- Rebuild: `npm run build`
 
-# Access admin endpoints
-curl -b cookies.txt http://localhost:8088/api/admin/collections
-```
+For detailed deployment guide, see `DEPLOYMENT.md` in the repository.
 
-### Data Generation
-```bash
-# Generate data (requires API key)
-curl -H "X-API-Key: your-api-key" \
-  http://localhost:8088/api/data/YourCollection/Performance
-```
+---
 
-For complete API documentation, visit http://localhost:8088/api/docs
-
-## ✅ Enhanced API Key Management (Complete)
-
-The system now includes comprehensive API key management with the following features:
-
-### 🔐 **API Key Features**
-- **Secure Creation**: Full API key displayed once with copy functionality
-- **Collection Access Control**: Grant access to all collections or specific ones
-- **Permission Display**: Clear indication of which collections each key can access
-- **Admin Privileges**: Admins can create API keys for any collection
-- **Independent Management**: API keys are managed separately from collections
-
-### 🗂️ **Collection Management**  
-- **Bulk Operations**: Multi-select collections for batch deletion
-- **Clean Deletion**: Simple confirmation without API key complications
-- **Field Counting**: Shows exact number of fields being deleted
-- **Cascade Safety**: Database handles permission cleanup automatically
-
-### 🎨 **User Experience**
-- **Intuitive UI**: Clean modals for creation and confirmation
-- **Security Warnings**: Clear messaging about API key handling
-- **Loading States**: Proper feedback during operations
-- **Error Handling**: Comprehensive validation and error messages
-
-### 🛠️ **Technical Implementation**
-- **RESTful APIs**: Properly structured endpoints for all operations
-- **Role-Based Access**: Admin and user permissions handled correctly  
-- **Database Relations**: Proper foreign keys and cascade behavior
-- **Frontend Build**: Cache-busting and optimized assets
-
-**Status**: Production-ready and fully tested  
-**Last Updated**: October 7, 2025
+**Version**: Production Ready  
+**Last Updated**: October 2025  
+**Port**: 8088 (single-port architecture)
