@@ -25,7 +25,7 @@ print_info() {
 }
 
 # Configuration
-SERVICE_NAME="rpo-gen"
+SERVICE_NAME="rpo-gendata"
 SERVICE_FILE="/etc/systemd/system/${SERVICE_NAME}.service"
 SERVICE_DESCRIPTION="RPO GenData Service"
 PROJECT_ROOT="/home/ubuntu/RPO_GenData"
