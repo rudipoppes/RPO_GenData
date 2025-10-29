@@ -70,7 +70,7 @@ export default function Samples() {
             {/* Step 2: Dynamic Applications */}
             <div className="bg-green-50 border border-green-200 rounded-lg p-6">
               <h3 className="text-lg font-semibold text-green-900 mb-4">
-                2. Create Dynamic Applications (DA) per Collection
+                2. Create Dynamic Applications (Performance and Configuration)
               </h3>
               <div className="space-y-4">
                 <div className="bg-white p-4 rounded border">
