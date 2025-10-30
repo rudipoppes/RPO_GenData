@@ -41,6 +41,7 @@ class FieldCreate(BaseModel):
     start_number: Optional[float] = None
     step_number: Optional[float] = None
     reset_number: Optional[float] = None
+    randomization_percentage: Optional[float] = 0.0
 
 class FieldUpdate(BaseModel):
     field_name: Optional[str] = None
@@ -62,6 +63,7 @@ class FieldUpdate(BaseModel):
     start_number: Optional[float] = None
     step_number: Optional[float] = None
     reset_number: Optional[float] = None
+    randomization_percentage: Optional[float] = None
 
 class FieldResponse(BaseModel):
     id: int
@@ -87,6 +89,7 @@ class FieldResponse(BaseModel):
     step_number: Optional[float] = None
     reset_number: Optional[float] = None
     current_number: Optional[float] = None
+    randomization_percentage: Optional[float] = None
     
     created_at: datetime
     updated_at: datetime

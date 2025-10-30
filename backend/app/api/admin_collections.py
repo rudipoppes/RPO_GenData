@@ -332,6 +332,7 @@ async def create_field(
         start_number=field_data.start_number,
         step_number=field_data.step_number,
         reset_number=field_data.reset_number,
+        randomization_percentage=field_data.randomization_percentage,
     )
     
     # Validate field configuration

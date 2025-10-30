@@ -144,6 +144,7 @@ export default function CollectionDetail() {
           ...(newField.start_number !== undefined && { start_number: newField.start_number }),
           ...(newField.step_number !== undefined && { step_number: newField.step_number }),
           ...(newField.reset_number !== undefined && { reset_number: newField.reset_number }),
+          ...(newField.randomization_percentage !== undefined && { randomization_percentage: newField.randomization_percentage }),
           ...(newField.current_number !== undefined && { current_number: newField.current_number })
         };
         await fieldsApi.create(collectionId, fieldData);
@@ -197,6 +198,9 @@ export default function CollectionDetail() {
         if (field.start_number !== undefined) config.push(`Start: ${field.start_number}`);
         if (field.step_number !== undefined) config.push(`Step: ${field.step_number}`);
         if (field.reset_number !== undefined) config.push(`Reset: ${field.reset_number}`);
+        if (field.randomization_percentage !== undefined && field.randomization_percentage > 0) {
+          config.push(`Randomization: ${field.randomization_percentage}%`);
+        }
         if (field.current_number !== undefined) config.push(`Current: ${field.current_number}`);
         break;
       case 'EPOCH_NOW':
@@ -358,6 +362,20 @@ export default function CollectionDetail() {
                 onChange={(e) => setNewField({...newField, reset_number: parseFloat(e.target.value)})}
                 placeholder="Reset to start when threshold reached"
               />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Randomization Percentage (%)</label>
+              <input
+                type="number"
+                step="0.1"
+                min="0"
+                max="100"
+                className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
+                value={newField.randomization_percentage ?? 0}
+                onChange={(e) => setNewField({...newField, randomization_percentage: parseFloat(e.target.value)})}
+                placeholder="Maximum variation from step size"
+              />
+              <p className="mt-1 text-sm text-gray-500">0% = no randomization, 100% = maximum variation</p>
             </div>
           </div>
         );

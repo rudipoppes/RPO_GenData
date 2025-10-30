@@ -119,7 +119,8 @@ export default function EditSpikeSchedule() {
         ...(field.float_precision !== undefined && { float_precision: field.float_precision }),
         ...(field.start_number !== undefined && { start_number: field.start_number }),
         ...(field.step_number !== undefined && { step_number: field.step_number }),
-        ...(field.reset_number !== undefined && { reset_number: field.reset_number })
+        ...(field.reset_number !== undefined && { reset_number: field.reset_number }),
+        ...(field.randomization_percentage !== undefined && { randomization_percentage: field.randomization_percentage })
       }));
 
       const updateData: UpdateSpikeScheduleRequest = {
@@ -277,6 +278,20 @@ export default function EditSpikeSchedule() {
                 onChange={(e) => handleFieldChange(field.original_field_id, 'reset_number', e.target.value ? parseFloat(e.target.value) : undefined)}
                 placeholder="Reset to start when threshold reached"
               />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Randomization Percentage (%)</label>
+              <input
+                type="number"
+                step="0.1"
+                min="0"
+                max="100"
+                className={baseClasses}
+                value={field.randomization_percentage || 0}
+                onChange={(e) => handleFieldChange(field.original_field_id, 'randomization_percentage', e.target.value ? parseFloat(e.target.value) : undefined)}
+                placeholder="Maximum variation from step size"
+              />
+              <p className="mt-1 text-xs text-gray-500">0% = no randomization, 100% = maximum variation</p>
             </div>
           </div>
         );

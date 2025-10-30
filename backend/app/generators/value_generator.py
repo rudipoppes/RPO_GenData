@@ -41,14 +41,19 @@ class ValueGenerator:
     @staticmethod
     def _handle_increment(field: Field, db: Session) -> float:
         """Handle INCREMENT value generation with persistence."""
+        # Calculate randomized step
+        randomized_step = ValueGenerator._apply_randomization(
+            field.step_number, field.randomization_percentage or 0.0
+        )
+        
         # If current is NULL, set to start and return it
         if field.current_number is None:
             current_value = field.start_number
-            field.current_number = current_value + field.step_number
+            field.current_number = current_value + randomized_step
         else:
             # Return current value and calculate next
             current_value = field.current_number
-            next_value = current_value + field.step_number
+            next_value = current_value + randomized_step
             
             # Check if reset_number is provided and next value exceeds reset threshold
             if field.reset_number is not None and next_value > field.reset_number:
@@ -63,14 +68,19 @@ class ValueGenerator:
     @staticmethod
     def _handle_decrement(field: Field, db: Session) -> float:
         """Handle DECREMENT value generation with persistence."""
+        # Calculate randomized step
+        randomized_step = ValueGenerator._apply_randomization(
+            field.step_number, field.randomization_percentage or 0.0
+        )
+        
         # If current is NULL, set to start and return it
         if field.current_number is None:
             current_value = field.start_number
-            field.current_number = current_value - field.step_number
+            field.current_number = current_value - randomized_step
         else:
             # Return current value and calculate next
             current_value = field.current_number
-            next_value = current_value - field.step_number
+            next_value = current_value - randomized_step
             
             # Check if reset_number is provided and next value falls below reset threshold
             if field.reset_number is not None and next_value < field.reset_number:
@@ -81,6 +91,16 @@ class ValueGenerator:
         
         db.flush()
         return current_value
+
+    @staticmethod
+    def _apply_randomization(step: float, percentage: float) -> float:
+        """Apply randomization to a step value."""
+        if not step or percentage <= 0:
+            return step
+        
+        # Calculate random factor between -percentage and +percentage
+        random_factor = random.uniform(-percentage / 100, percentage / 100)
+        return step * (1 + random_factor)
 
     @staticmethod
     def validate_field_config(field: Field) -> list[str]:
@@ -116,5 +136,12 @@ class ValueGenerator:
                 errors.append("start_number and step_number are required for INCREMENT/DECREMENT")
             elif field.step_number <= 0:
                 errors.append("step_number must be > 0")
+            
+            # Validate randomization percentage
+            if field.randomization_percentage is not None:
+                if field.randomization_percentage < 0:
+                    errors.append("randomization_percentage must be >= 0")
+                elif field.randomization_percentage > 100:
+                    errors.append("randomization_percentage must be <= 100")
         
         return errors

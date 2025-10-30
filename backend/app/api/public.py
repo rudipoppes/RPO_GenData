@@ -99,7 +99,8 @@ async def get_generated_data(
                 start_number=spike_field.start_number,
                 step_number=spike_field.step_number,
                 reset_number=spike_field.reset_number,
-                current_number=spike_field.current_number
+                current_number=spike_field.current_number,
+                randomization_percentage=spike_field.randomization_percentage or 0.0
             )
             
             try:

@@ -42,6 +42,7 @@ export interface Field {
   step_number?: number;
   reset_number?: number;
   current_number?: number;
+  randomization_percentage?: number;
   
   created_at: string;
   updated_at: string;
@@ -100,6 +101,7 @@ export interface CreateFieldRequest {
   step_number?: number;
   reset_number?: number;
   current_number?: number;
+  randomization_percentage?: number;
 }
 
 export interface CreateAPIKeyRequest {
@@ -167,6 +169,7 @@ export interface SpikeScheduleField {
   step_number?: number;
   reset_number?: number;
   current_number?: number;
+  randomization_percentage?: number;
 }
 
 export interface SpikeSchedule {
@@ -199,6 +202,7 @@ export interface CreateSpikeScheduleRequest {
     start_number?: number;
     step_number?: number;
     reset_number?: number;
+    randomization_percentage?: number;
   }>;
 }
 
@@ -218,5 +222,6 @@ export interface UpdateSpikeScheduleRequest {
     start_number?: number;
     step_number?: number;
     reset_number?: number;
+    randomization_percentage?: number;
   }>;
 }

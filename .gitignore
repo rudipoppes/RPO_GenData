@@ -44,3 +44,4 @@ DEVELOPMENT_RULES.md
 backend/venv/
 frontend/node_modules/
 frontend/dist/
+backend/package-lock.json

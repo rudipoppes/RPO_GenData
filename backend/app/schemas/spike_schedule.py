@@ -16,6 +16,7 @@ class SpikeScheduleFieldCreate(BaseModel):
     start_number: Optional[float] = None
     step_number: Optional[float] = None
     reset_number: Optional[float] = None
+    randomization_percentage: Optional[float] = 0.0
 
 class SpikeScheduleCreate(BaseModel):
     collection_id: int
@@ -81,18 +82,21 @@ class SpikeScheduleFieldResponse(BaseModel):
     is_editable: bool  # Computed: True for numeric performance fields
     
     # All field values
-    fixed_value_text: Optional[str]
-    fixed_value_number: Optional[int]
-    fixed_value_float: Optional[float]
-    range_start_number: Optional[int]
-    range_end_number: Optional[int]
-    range_start_float: Optional[float]
-    range_end_float: Optional[float]
-    float_precision: Optional[int]
-    start_number: Optional[float]
-    step_number: Optional[float]
-    reset_number: Optional[float]
-    current_number: Optional[float]
+    fixed_value_text: Optional[str] = None
+    fixed_value_number: Optional[int] = None
+    fixed_value_float: Optional[float] = None
+    range_start_number: Optional[int] = None
+    range_end_number: Optional[int] = None
+    range_start_float: Optional[float] = None
+    range_end_float: Optional[float] = None
+    float_precision: Optional[int] = None
+    start_number: Optional[float] = None
+    step_number: Optional[float] = None
+    reset_number: Optional[float] = None
+    current_number: Optional[float] = None
+    
+    # Randomization field - only used for INCREMENT/DECREMENT types
+    randomization_percentage: Optional[float] = None
     
     class Config:
         from_attributes = True

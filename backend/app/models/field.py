@@ -47,6 +47,7 @@ class Field(Base):
     step_number = Column(Float, nullable=True)
     reset_number = Column(Float, nullable=True)
     current_number = Column(Float, nullable=True)  # Persisted state
+    randomization_percentage = Column(Float, nullable=True, default=0.0)  # Randomization for step variation
     
     created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
     updated_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
