@@ -101,6 +101,7 @@ BACKEND_CORS_ORIGINS='["http://your-server:8088"]'
 
 - **🔐 Authentication**: Cookie-based session management for admin interface
 - **📊 Data Generation**: Configurable fields (fixed, ranges, patterns, timestamps)
+- **🎲 Randomization**: Non-linear progression for increment/decrement fields with 0-100% variation
 - **🔑 API Keys**: Scoped access with fine-grained permissions
 - **⚙️ Admin UI**: React-based interface for collections and configuration
 - **🔄 Database Migrations**: Alembic-based version control

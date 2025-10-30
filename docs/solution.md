@@ -15,7 +15,7 @@ RPO_RPO_GenData is a small, maintainable system that lets users define collectio
 - Collections have a name and two types of data groupings: Performance and Configuration.
 - Fields belong to a collection + type, and use one of the supported value types.
 - Fixed-only types: TEXT_FIXED, NUMBER_FIXED, FLOAT_FIXED.
-- Generated types: EPOCH_NOW (epoch seconds), NUMBER_RANGE, FLOAT_RANGE, INCREMENT, DECREMENT.
+- Generated types: EPOCH_NOW (epoch seconds), NUMBER_RANGE, FLOAT_RANGE, INCREMENT, DECREMENT (with configurable randomization).
 - Increment/decrement persist last value across calls; ranges and epoch are computed at request time.
 - Public API enforces API keys with read-only scope; keys can be restricted to owned collections.
 
@@ -79,6 +79,7 @@ RPO_RPO_GenData is a small, maintainable system that lets users define collectio
   - step_number (REAL, nullable)
   - reset_number (REAL, nullable)
   - current_number (REAL, nullable)  // persisted state for inc/dec
+  - randomization_percentage (REAL, nullable, default 0.0)  // 0-100% variation for inc/dec
   - created_at, updated_at
 - users
   - id (PK), email/username (unique), password_hash (Argon2id), role (Admin/Editor/Viewer)
@@ -102,9 +103,12 @@ Constraints:
 - NUMBER_RANGE: random integer in [start, end].
 - FLOAT_RANGE: random float in [start, end], rounded to float_precision (default 2).
 - INCREMENT:
-  - if current is NULL → set to start; emit; next = current + step; if next > reset → start; persist next.
+  - if current is NULL → set to start; emit; next = current + randomized_step; if next > reset → start; persist next.
+  - randomized_step = step * (1 + random_uniform(-randomization_percentage/100, +randomization_percentage/100))
 - DECREMENT:
-  - if current is NULL → set to start; emit; next = current - step; if next < reset → start; persist next.
+  - if current is NULL → set to start; emit; next = current - randomized_step; if next < reset → start; persist next.
+  - randomized_step = step * (1 + random_uniform(-randomization_percentage/100, +randomization_percentage/100))
+  - randomization_percentage: 0-100% (0% = linear, 100% = maximum variation)
 - TEXT_FIXED / NUMBER_FIXED / FLOAT_FIXED: return stored value as-is.
 
 ## 7) Auth and access control

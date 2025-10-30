@@ -95,6 +95,7 @@ def upgrade() -> None:
     sa.Column('step_number', sa.Float(), nullable=True),
     sa.Column('reset_number', sa.Float(), nullable=True),
     sa.Column('current_number', sa.Float(), nullable=True),
+    sa.Column('randomization_percentage', sa.Float(), nullable=True, server_default='0.0'),
     sa.Column('created_at', sa.DateTime(), nullable=True),
     sa.Column('updated_at', sa.DateTime(), nullable=True),
     sa.ForeignKeyConstraint(['collection_id'], ['collections.id'], ),
