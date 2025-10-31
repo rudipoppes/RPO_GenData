@@ -100,7 +100,10 @@ class ValueGenerator:
         
         # Calculate random factor between -percentage and +percentage
         random_factor = random.uniform(-percentage / 100, percentage / 100)
-        return step * (1 + random_factor)
+        randomized_step = step * (1 + random_factor)
+        
+        # Prevent negative step values
+        return max(0, randomized_step)
 
     @staticmethod
     def validate_field_config(field: Field) -> list[str]:
@@ -141,7 +144,7 @@ class ValueGenerator:
             if field.randomization_percentage is not None:
                 if field.randomization_percentage < 0:
                     errors.append("randomization_percentage must be >= 0")
-                elif field.randomization_percentage > 100:
-                    errors.append("randomization_percentage must be <= 100")
+                elif field.randomization_percentage > 500:
+                    errors.append("randomization_percentage must be <= 500")
         
         return errors

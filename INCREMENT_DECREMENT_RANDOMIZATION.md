@@ -4,6 +4,8 @@
 
 This feature introduces randomization to the increment and decrement field types in RPO GenData to prevent linear progression and create more realistic, non-linear data patterns while maintaining the overall upward or downward trend.
 
+**Enhanced Randomization Range**: Support for 0-500% randomization, providing significantly more variation for small step sizes while maintaining data trends. This addresses the issue where small step sizes (0.1, 0.5) had minimal variation even at 100% randomization.
+
 ## Problem Statement
 
 Currently, increment and decrement field types progress linearly:

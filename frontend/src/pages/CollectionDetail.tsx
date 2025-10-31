@@ -369,13 +369,13 @@ export default function CollectionDetail() {
                 type="number"
                 step="0.1"
                 min="0"
-                max="100"
+                max="500"
                 className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
                 value={newField.randomization_percentage ?? 0}
                 onChange={(e) => setNewField({...newField, randomization_percentage: parseFloat(e.target.value)})}
                 placeholder="Maximum variation from step size"
               />
-              <p className="mt-1 text-sm text-gray-500">0% = no randomization, 100% = maximum variation</p>
+              <p className="mt-1 text-sm text-gray-500">0% = no randomization, 500% = maximum variation</p>
             </div>
           </div>
         );

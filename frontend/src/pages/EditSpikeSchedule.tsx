@@ -285,13 +285,13 @@ export default function EditSpikeSchedule() {
                 type="number"
                 step="0.1"
                 min="0"
-                max="100"
+                max="500"
                 className={baseClasses}
                 value={field.randomization_percentage || 0}
                 onChange={(e) => handleFieldChange(field.original_field_id, 'randomization_percentage', e.target.value ? parseFloat(e.target.value) : undefined)}
                 placeholder="Maximum variation from step size"
               />
-              <p className="mt-1 text-xs text-gray-500">0% = no randomization, 100% = maximum variation</p>
+              <p className="mt-1 text-xs text-gray-500">0% = no randomization, 500% = maximum variation</p>
             </div>
           </div>
         );
