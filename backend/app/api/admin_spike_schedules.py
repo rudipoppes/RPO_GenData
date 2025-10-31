@@ -218,7 +218,8 @@ async def update_spike_schedule(
 ):
     """Update a spike schedule."""
     schedule = db.query(SpikeSchedule).options(
-        joinedload(SpikeSchedule.collection)
+        joinedload(SpikeSchedule.collection),
+        joinedload(SpikeSchedule.spike_fields)
     ).filter(SpikeSchedule.id == schedule_id).first()
     
     if not schedule:
@@ -247,7 +248,8 @@ async def update_spike_schedule(
                 # Update numeric values
                 for attr in ['fixed_value_number', 'fixed_value_float', 'range_start_number',
                            'range_end_number', 'range_start_float', 'range_end_float',
-                           'float_precision', 'start_number', 'step_number', 'reset_number']:
+                           'float_precision', 'start_number', 'step_number', 'reset_number',
+                           'randomization_percentage']:
                     value = getattr(modified, attr)
                     if value is not None:
                         setattr(spike_field, attr, value)
@@ -303,7 +305,8 @@ def build_spike_schedule_response(schedule: SpikeSchedule, db: Session) -> Spike
             start_number=sf.start_number,
             step_number=sf.step_number,
             reset_number=sf.reset_number,
-            current_number=sf.current_number
+            current_number=sf.current_number,
+            randomization_percentage=sf.randomization_percentage
         ))
     
     return SpikeScheduleResponse(

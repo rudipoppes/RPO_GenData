@@ -68,7 +68,10 @@ export default function EditSpikeSchedule() {
         f.is_editable && 
         f.collection_type === 'Performance' && 
         PERFORMANCE_NUMERIC_TYPES.includes(f.value_type)
-      ));
+      ).map(f => ({
+        ...f,
+        randomization_percentage: f.randomization_percentage || 0
+      })));
     } catch (err: any) {
       setError('Failed to load spike schedule');
     } finally {
