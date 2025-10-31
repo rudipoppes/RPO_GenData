@@ -104,7 +104,8 @@ async def create_spike_schedule(
             start_number=field.start_number,
             step_number=field.step_number,
             reset_number=field.reset_number,
-            current_number=field.current_number
+            current_number=field.current_number,
+            randomization_percentage=field.randomization_percentage
         )
         
         # If this field was modified in the request, update with new values
@@ -131,6 +132,8 @@ async def create_spike_schedule(
                 spike_field.step_number = modified.step_number
             if modified.reset_number is not None:
                 spike_field.reset_number = modified.reset_number
+            if modified.randomization_percentage is not None:
+                spike_field.randomization_percentage = modified.randomization_percentage
         
         db.add(spike_field)
     
