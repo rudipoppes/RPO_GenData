@@ -41,23 +41,24 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="max-w-md w-full space-y-8">
+    <div 
+      className="min-h-screen flex items-center justify-center bg-cover bg-center bg-no-repeat relative"
+      style={{ backgroundImage: 'url("/server-login.svg")' }}
+    >
+      <div className="absolute inset-0 bg-black bg-opacity-40"></div>
+      <div className="max-w-md w-full space-y-8 relative z-10">
         <div>
-          <div className="flex justify-center mb-6">
-            <img src="/server-login.svg" alt="Server Environment" className="h-64 w-auto" />
-          </div>
-          <h2 className="text-center text-3xl font-extrabold text-gray-900">
+          <h2 className="text-center text-3xl font-extrabold text-white">
             Data Generator Admin
           </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
+          <p className="mt-2 text-center text-sm text-gray-200">
             Sign in to your account
           </p>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           {error && (
-            <div className="rounded-md bg-red-50 p-4">
-              <div className="text-sm text-red-700">{error}</div>
+            <div className="rounded-md bg-red-900 bg-opacity-80 p-4">
+              <div className="text-sm text-red-200">{error}</div>
             </div>
           )}
           <div className="rounded-md shadow-sm -space-y-px">
@@ -106,7 +107,7 @@ export default function Login() {
           </div>
         </form>
 
-        <div className="text-center text-sm text-gray-500">
+        <div className="text-center text-sm text-gray-300">
         </div>
       </div>
     </div>
