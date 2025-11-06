@@ -28,6 +28,10 @@ dist/
 .DS_Store
 .vscode/
 
+# Environment-specific images (these should be generated locally)
+frontend/public/server-*.svg
+frontend/public/env-*.svg
+
 # EXCEPTION: Allow project design database backups
 !project_design_docs/*.db
 
