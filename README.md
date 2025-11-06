@@ -23,6 +23,7 @@ cd RPO_GenData
 - **🔄 Database Migrations**: Alembic-based version control
 - **📋 Import/Export**: JSON-based configuration management
 - **🏥 Health Checks**: Built-in health monitoring endpoints
+- **🎯 Environment Identification**: Visual server identification for development/staging/production environments
 
 ## 🔗 Access Points
 
@@ -54,12 +55,29 @@ npm install
 npm run build
 ```
 
+## 🎯 Environment Identification
+
+The service includes visual environment identification to help distinguish between different server deployments (development, staging, production). 
+
+**Purpose**: These images are **NOT** product branding - they serve purely as visual indicators to quickly identify which server environment you're working on.
+
+**Files to Customize**:
+- `frontend/public/server-logo.svg` - Small logo shown in the navigation menu bar (32px height)
+- `frontend/public/server-login.svg` - Larger image shown on the login page (96px height)
+
+**Usage**:
+- Replace the placeholder SVG files with environment-specific visuals
+- Use different colors, text, or icons for each environment (e.g., "DEV", "STAGING", "PROD")
+- Changes appear immediately after browser refresh - no service restart required
+- Images are static files served from the frontend's `public/` directory
+
 ## 📁 Project Structure
 
 ```
 RPO_GenData/
 ├── backend/          # FastAPI application
 ├── frontend/         # React interface
+│   └── public/       # Static assets (server-logo.svg, server-login.svg)
 ├── data/            # SQLite database
 ├── deploy.sh        # One-command deployment
 └── *.md            # Documentation files

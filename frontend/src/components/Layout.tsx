@@ -35,9 +35,9 @@ export default function Layout({ children }: LayoutProps) {
             <div className="flex">
               <Link
                 to="/"
-                className="flex items-center px-4 text-lg font-medium text-gray-900"
+                className="flex items-center px-4"
               >
-                Data Generator
+                <img src="/server-logo.svg" alt="Server Environment" className="h-8 w-auto" />
               </Link>
               <div className="flex space-x-8 ml-6">
                 {navigation.map((item) => (

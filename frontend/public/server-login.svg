@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="192" height="96" viewBox="0 0 192 96" xmlns="http://www.w3.org/2000/svg">
+  <rect width="192" height="96" fill="#10B981" rx="8"/>
+  <text x="96" y="45" font-family="Arial, sans-serif" font-size="18" fill="white" text-anchor="middle" font-weight="bold">SERVER</text>
+  <text x="96" y="65" font-family="Arial, sans-serif" font-size="14" fill="white" text-anchor="middle">Environment</text>
+</svg>
