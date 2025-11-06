@@ -45,7 +45,7 @@ export default function Login() {
       <div className="max-w-md w-full space-y-8">
         <div>
           <div className="flex justify-center mb-6">
-            <img src="/server-login.svg" alt="Server Environment" className="h-24 w-auto" />
+            <img src="/server-login.svg" alt="Server Environment" className="h-64 w-auto" />
           </div>
           <h2 className="text-center text-3xl font-extrabold text-gray-900">
             Data Generator Admin
