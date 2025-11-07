@@ -104,7 +104,7 @@ async def create_spike_schedule(
             start_number=field.start_number,
             step_number=field.step_number,
             reset_number=field.reset_number,
-            current_number=field.current_number,
+            # current_number is NOT copied - original field is single source of truth
             randomization_percentage=field.randomization_percentage
         )
         
